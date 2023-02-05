@@ -811,6 +811,7 @@ const uint8 *g_asset_ptrs[kNumberOfAssets];
 uint32 g_asset_sizes[kNumberOfAssets];
 
 static void LoadAssets() {
+  // TODO static allocation --> direct flash access???
   size_t length = 0;
   uint8 *data = ReadWholeFile("tables/zelda3_assets.dat", &length);
   if (!data)

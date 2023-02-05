@@ -9,6 +9,8 @@
 
 #include "spc_player.h"
 
+// TODO #include "porting.h" + replace calls to SDL with "porting" functions???
+
 typedef struct MemMap {
   uint16 off, org_off;
 } MemMap;
