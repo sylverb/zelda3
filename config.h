@@ -1,6 +1,8 @@
 #pragma once
 #include "types.h"
+#ifndef HEADLESS
 #include <SDL_keycode.h>
+#endif
 
 enum {
   kKeys_Null,
@@ -104,5 +106,7 @@ enum {
 extern Config g_config;
 
 void ParseConfigFile(const char *filename);
+#ifndef HEADLESS
 int FindCmdForSdlKey(SDL_Keycode code, SDL_Keymod mod);
+#endif
 int FindCmdForGamepadButton(int button, uint32 modifiers);
