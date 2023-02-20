@@ -174,7 +174,7 @@ void ppu_runLine(Ppu *ppu, int line) {
 
     // outside of visible range?
     if (line >= 225 + ppu->extraBottomCur) {
-      memset(&ppu->renderBuffer[(line - 1) * ppu->renderPitch], 0, sizeof(uint32) * (256 + ppu->extraLeftRight * 2));
+      memset(&ppu->renderBuffer[(line - 1) * ppu->renderPitch], 0, sizeof(uint16_t) * (256 + ppu->extraLeftRight * 2));
       return;
     }
 
@@ -188,8 +188,8 @@ void ppu_runLine(Ppu *ppu, int line) {
 
       uint8 *dst = ppu->renderBuffer + ((line - 1) * ppu->renderPitch);
       if (ppu->extraLeftRight != 0) {
-        memset(dst, 0, sizeof(uint32) * ppu->extraLeftRight);
-        memset(dst + sizeof(uint32) * (256 + ppu->extraLeftRight), 0, sizeof(uint32) * ppu->extraLeftRight);
+        memset(dst, 0, sizeof(uint16_t) * ppu->extraLeftRight);
+        memset(dst + sizeof(uint16_t) * (256 + ppu->extraLeftRight), 0, sizeof(uint32) * ppu->extraLeftRight);
       }
     }
   }
@@ -776,6 +776,7 @@ static void PpuDrawMode7Upsampled(Ppu *ppu, uint y) {
       uint32 pixel = pixels[i] & 0xff;
       if (pixel) {
         uint32 color = ppu->colorMapRgb[pixel];
+        // TODO RGB565 --> NOT USED --> upsample 4x4 for each pixel !!!
         ((uint32 *)dst)[3] = ((uint32 *)dst)[2] = ((uint32 *)dst)[1] = ((uint32 *)dst)[0] = color;
         ((uint32 *)(dst + pitch * 1))[3] = ((uint32 *)(dst + pitch * 1))[2] = ((uint32 *)(dst + pitch * 1))[1] = ((uint32 *)(dst + pitch * 1))[0] = color;
         ((uint32 *)(dst + pitch * 2))[3] = ((uint32 *)(dst + pitch * 2))[2] = ((uint32 *)(dst + pitch * 2))[1] = ((uint32 *)(dst + pitch * 2))[0] = color;
@@ -881,7 +882,8 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
   uint32 cw_clip_math = ((cwin.bits & kCwBitsMod[ppu->clipMode]) ^ kCwBitsMod[ppu->clipMode + 4]) |
                         ((cwin.bits & kCwBitsMod[ppu->preventMathMode]) ^ kCwBitsMod[ppu->preventMathMode + 4]) << 8;
 
-  uint32 *dst = (uint32*)&ppu->renderBuffer[(y - 1) * ppu->renderPitch], *dst_org = dst;
+  // TODO uint16_t for RGB565 ???
+  uint16_t *dst = (uint16_t*)&ppu->renderBuffer[(y - 1) * ppu->renderPitch], *dst_org = dst;
   
   dst += (ppu->extraLeftRight - ppu->extraLeftCur);
 
@@ -891,15 +893,17 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
     // If clip is set, then zero out the rgb values from the main screen.
     uint32 clip_color_mask = (cw_clip_math & 1) ? 0x1f : 0;
     uint32 math_enabled_cur = (cw_clip_math & 0x100) ? math_enabled : 0;
-    uint32 fixed_color = ppu->fixedColorR | ppu->fixedColorG << 5 | ppu->fixedColorB << 10;
+    uint16_t fixed_color = ppu->fixedColorR | ppu->fixedColorG << 5 | ppu->fixedColorB << 10;
     if (math_enabled_cur == 0 || fixed_color == 0 && !ppu->halfColor && !rendered_subscreen) {
       // Math is disabled (or has no effect), so can avoid the per-pixel maths check
       uint32 i = left;
       do {
-        uint32 color = ppu->cgram[ppu->bgBuffers[0].data[i] & 0xff];
-        dst[0] = ppu->brightnessMult[color & clip_color_mask] << 16 |
+        uint16_t color = ppu->cgram[ppu->bgBuffers[0].data[i] & 0xff];
+        // FIXME DON'T CONVERT TO ARGB8888, KEEP IT RGB565
+        dst[0] = color;
+                 /*ppu->brightnessMult[color & clip_color_mask] << 16 |
                  ppu->brightnessMult[(color >> 5) & clip_color_mask] << 8 |
-                 ppu->brightnessMult[(color >> 10) & clip_color_mask];
+                 ppu->brightnessMult[(color >> 10) & clip_color_mask];*/
       } while (dst++, ++i < right);
     } else {
       uint8 *half_color_map = ppu->halfColor ? ppu->brightnessMultHalf : ppu->brightnessMult;
@@ -908,7 +912,8 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
       // Need to check for each pixel whether to use math or not based on the main screen layer.
       uint32 i = left;
       do {
-        uint32 color = ppu->cgram[ppu->bgBuffers[0].data[i] & 0xff], color2;
+        // TODO uint16_t for RGB565 ???
+        uint16_t color = ppu->cgram[ppu->bgBuffers[0].data[i] & 0xff], color2;
         uint8 main_layer = (ppu->bgBuffers[0].data[i] >> 8) & 0xf;
         uint32 r = color & clip_color_mask;
         uint32 g = (color >> 5) & clip_color_mask;
@@ -934,17 +939,20 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
             b += b2;
           }
         }
-        dst[0] = color_map[b] | color_map[g] << 8 | color_map[r] << 16;
+        // TODO RGB565 !!!
+        // TODO if b is 8bit --> need to convert not just truncate
+        //dst[0] = (b & 0x1f) | ((g & 0x1f) << 5) | ((r & 0x1f) << 11);//color_map[b] | color_map[g] << 8 | color_map[r] << 16;
+        dst[0] = (b >> 3) | ((g >> 2) << 5) | ((r >> 3) << 11);
       } while (dst++, ++i < right);
     }
   } while (cw_clip_math >>= 1, ++windex < cwin.nr);
 
   // Clear out stuff on the sides.
   if (ppu->extraLeftRight - ppu->extraLeftCur != 0)
-    memset(dst_org, 0, sizeof(uint32) * (ppu->extraLeftRight - ppu->extraLeftCur));
+    memset(dst_org, 0, sizeof(uint16_t) * (ppu->extraLeftRight - ppu->extraLeftCur));
   if (ppu->extraLeftRight - ppu->extraRightCur != 0)
     memset(dst_org + (256 + ppu->extraLeftRight * 2 - (ppu->extraLeftRight - ppu->extraRightCur)), 0,
-        sizeof(uint32) * (ppu->extraLeftRight - ppu->extraRightCur));
+        sizeof(uint16_t) * (ppu->extraLeftRight - ppu->extraRightCur));
 }
 
 static void ppu_handlePixel(Ppu* ppu, int x, int y) {
@@ -1000,11 +1008,19 @@ static void ppu_handlePixel(Ppu* ppu, int x, int y) {
     }
   }
   int row = y - 1;
-  uint8 *pixelBuffer = (uint8*) &ppu->renderBuffer[row * ppu->renderPitch + (x + ppu->extraLeftRight) * 4];
+  uint8 *pixelBuffer = (uint8*) &ppu->renderBuffer[row * ppu->renderPitch + (x + ppu->extraLeftRight) * 2];
+  // TODO uint16_t RGB565
+  r2 *= ppu->brightness / 15;
+  g2 *= ppu->brightness / 15;
+  b2 *= ppu->brightness / 15;
+  pixelBuffer[0] = ((g2 & 0x07) << 5) | (b2 & 0x1f);
+  pixelBuffer[1] = ((r2 & 0x1f) << 3) | (g2 >> 3);
+  /*
   pixelBuffer[0] = ((b << 3) | (b >> 2)) * ppu->brightness / 15;
   pixelBuffer[1] = ((g << 3) | (g >> 2)) * ppu->brightness / 15;
   pixelBuffer[2] = ((r << 3) | (r >> 2)) * ppu->brightness / 15;
   pixelBuffer[3] = 0;
+  */
 }
 
 static const int bitDepthsPerMode[10][4] = {

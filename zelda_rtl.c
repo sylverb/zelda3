@@ -239,7 +239,7 @@ static void ZeldaInitializationCode() {
   zelda_snes_dummy_write(HDMAEN, 0);
   zelda_snes_dummy_write(MDMAEN, 0);
 
-  Sound_LoadIntroSongBank();
+  // FIXME Sound_LoadIntroSongBank();
 
   Startup_InitializeMemory();
 

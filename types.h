@@ -7,7 +7,7 @@
 
 // Build time config options
 enum {
-  kEnableLargeScreen = 1,
+  kEnableLargeScreen = 0,
   // How much extra spacing to add on the sides
   kPpuExtraLeftRight = kEnableLargeScreen ? 96 : 0,
 };
