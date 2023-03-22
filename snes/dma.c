@@ -24,10 +24,13 @@ static const int transferLength[8] = {
   1, 2, 2, 4, 4, 4, 2, 4
 };
 
+static Dma g_dma __attribute__((section (".dtcram_hot_bss")));
+
 static void dma_transferByte(Dma* dma, uint16_t aAdr, uint8_t aBank, uint8_t bAdr, bool fromB);
 
 Dma* dma_init(Snes* snes) {
-  Dma* dma = (Dma*)malloc(sizeof(Dma));
+  // Static allocation
+  Dma* dma = &g_dma;  //(Dma*)malloc(sizeof(Dma));
   dma->snes = snes;
   return dma;
 }
@@ -119,6 +122,7 @@ uint8_t dma_read(Dma* dma, uint16_t adr) {
   }
 }
 
+__attribute__((section (".text_in_ram")))
 void dma_write(Dma* dma, uint16_t adr, uint8_t val) {
   uint8_t c = (adr & 0x70) >> 4;
   switch(adr & 0xf) {
@@ -314,6 +318,7 @@ bool dma_cycle(Dma* dma) {
   return false;
 }
 
+__attribute__((section (".text_in_ram")))
 void dma_startDma(Dma* dma, uint8_t val, bool hdma) {
   for(int i = 0; i < 8; i++) {
     if(hdma) {

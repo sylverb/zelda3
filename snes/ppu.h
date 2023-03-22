@@ -49,7 +49,7 @@ struct Ppu {
   bool lineHasSprites;
   uint8_t lastBrightnessMult;
   uint8_t lastMosaicModulo;
-  uint8_t renderFlags;
+  uint32_t renderFlags;
   uint32_t renderPitch;
   uint8_t *renderBuffer;
   uint8_t extraLeftCur, extraRightCur, extraLeftRight, extraBottomCur;

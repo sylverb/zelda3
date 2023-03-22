@@ -60,6 +60,7 @@ static const uint8 kMapModeHdma1[7] = {0xf0, AT_WORD(0xdee7), 0xf0, AT_WORD(0xdf
 static const uint8 kAttractIndirectHdmaTab[7] = {0xf0, AT_WORD(0x1b00), 0xf0, AT_WORD(0x1be0), 0};
 static const uint8 kHdmaTableForPrayingScene[7] = {0xf8, AT_WORD(0x1b00), 0xf8, AT_WORD(0x1bf0), 0};
 
+__attribute__((section (".text_in_ram")))
 void zelda_ppu_write(uint32_t adr, uint8_t val) {
   assert(adr >= INIDISP && adr <= STAT78);
   ppu_write(g_zenv.ppu, (uint8)adr, val);
@@ -100,6 +101,7 @@ static const uint8 *SimpleHdma_GetPtr(uint32 p) {
   }
 }
 
+__attribute__((section (".text_in_ram")))
 static void SimpleHdma_Init(SimpleHdma *c, DmaChannel *dc) {
   if (!dc->hdmaActive) {
     c->table = 0;
@@ -112,6 +114,7 @@ static void SimpleHdma_Init(SimpleHdma *c, DmaChannel *dc) {
   c->indir_bank = dc->indBank;
 }
 
+__attribute__((section (".text_in_ram")))
 static void SimpleHdma_DoLine(SimpleHdma *c) {
   if (c->table == NULL)
     return;
@@ -137,6 +140,7 @@ static void SimpleHdma_DoLine(SimpleHdma *c) {
   c->rep_count--;
 }
 
+__attribute__((section (".text_in_ram")))
 static void ConfigurePpuSideSpace() {
   // Let PPU impl know about the maximum allowed extra space on the sides and bottom
   int extra_right = 0, extra_left = 0, extra_bottom = 0;
@@ -172,6 +176,7 @@ static void ConfigurePpuSideSpace() {
   PpuSetExtraSideSpace(g_zenv.ppu, extra_left, extra_right, extra_bottom);
 }
 
+__attribute__((section (".text_in_ram")))
 void ZeldaDrawPpuFrame(uint8 *pixel_buffer, size_t pitch, uint32 render_flags) {
   SimpleHdma hdma_chans[2];
 
@@ -199,7 +204,9 @@ void ZeldaDrawPpuFrame(uint8 *pixel_buffer, size_t pitch, uint32 render_flags) {
 
   int height = render_flags & kPpuRenderFlags_Height240 ? 240 : 224;
 
-  for (int i = 0; i <= height; i++) {
+  // Increase framerate by skipping lines
+  uint8_t offset = (g_zenv.ppu->renderFlags & 0x03000000) >> 24;
+  for (int i = offset; i <= height; i+=4) {
     if (i == 128 && irq_flag) {
       zelda_ppu_write(BG3HOFS, selectfile_var8);
       zelda_ppu_write(BG3HOFS, selectfile_var8 >> 8);
@@ -216,6 +223,7 @@ void ZeldaDrawPpuFrame(uint8 *pixel_buffer, size_t pitch, uint32 render_flags) {
   }
 }
 
+__attribute__((section (".text_in_ram")))
 void HdmaSetup(uint32 addr6, uint32 addr7, uint8 transfer_unit, uint8 reg6, uint8 reg7, uint8 indirect_bank) {
   Dma *dma = g_zenv.dma;
   if (addr6) {
