@@ -205,8 +205,9 @@ void ZeldaDrawPpuFrame(uint8 *pixel_buffer, size_t pitch, uint32 render_flags) {
   int height = render_flags & kPpuRenderFlags_Height240 ? 240 : 224;
 
   // Increase framerate by skipping lines
-  uint8_t offset = (g_zenv.ppu->renderFlags & 0x03000000) >> 24;
-  for (int i = offset; i <= height; i+=4) {
+  uint8_t rowStep = ((g_zenv.ppu->renderFlags & 0xc0000000) >> 30) + 1;
+  uint8_t offset = ((g_zenv.ppu->renderFlags & 0x0f000000) >> 24) % rowStep;
+  for (int i = offset; i <= height; i+=rowStep) {
     if (i == 128 && irq_flag) {
       zelda_ppu_write(BG3HOFS, selectfile_var8);
       zelda_ppu_write(BG3HOFS, selectfile_var8 >> 8);

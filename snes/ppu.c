@@ -191,8 +191,10 @@ void ppu_runLine(Ppu *ppu, int line) {
       if (ppu->mode == 7)
         ppu_calculateMode7Starts(ppu, line);
       // Increase framerate by skipping columns
-      uint8_t offset = 3 - ((ppu->renderFlags & 0x0c000000) >> 26);
-      for (int x = offset; x < 256; x+=4)
+      uint8_t rowStep = ((ppu->renderFlags & 0xc0000000) >> 30) + 1;
+      uint8_t colStep = ((ppu->renderFlags & 0x30000000) >> 28) + 1;
+      uint8_t offset = colStep - 1 - ((((ppu->renderFlags & 0x0f000000) >> 24) / rowStep) % colStep);
+      for (int x = offset; x < 256; x+=colStep)
         ppu_handlePixel(ppu, x, line);
 
       uint8 *dst = ppu->renderBuffer + ((line - 1) * ppu->renderPitch);
@@ -900,7 +902,9 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
   uint32 cw_clip_math = ((cwin.bits & kCwBitsMod[ppu->clipMode]) ^ kCwBitsMod[ppu->clipMode + 4]) |
                         ((cwin.bits & kCwBitsMod[ppu->preventMathMode]) ^ kCwBitsMod[ppu->preventMathMode + 4]) << 8;
 
-  uint8_t offset = 3 - ((ppu->renderFlags & 0x0c000000) >> 26);
+  uint8_t rowStep = ((ppu->renderFlags & 0xc0000000) >> 30) + 1;
+  uint8_t colStep = ((ppu->renderFlags & 0x30000000) >> 28) + 1;
+  uint8_t offset = colStep - 1 - ((((ppu->renderFlags & 0x0f000000) >> 24) / rowStep) % colStep);
   
   // TODO uint16_t for RGB565 ???
   uint16_t *dst = (uint16_t*)&ppu->renderBuffer[(y - 1) * ppu->renderPitch], *dst_org = dst;
@@ -927,7 +931,7 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
                  /*ppu->brightnessMult[color & clip_color_mask] << 16 |
                  ppu->brightnessMult[(color >> 5) & clip_color_mask] << 8 |
                  ppu->brightnessMult[(color >> 10) & clip_color_mask];*/
-      } while (dst+=4, i+=4, i < right);
+      } while (dst+=colStep, i+=colStep, i < right);
     } else {
       uint8 *half_color_map = ppu->halfColor ? ppu->brightnessMultHalf : ppu->brightnessMult;
       // Store this in locals
@@ -967,7 +971,7 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
         // TODO if b is 8bit --> need to convert not just truncate
         //dst[0] = (b & 0x1f) | ((g & 0x1f) << 5) | ((r & 0x1f) << 11);//color_map[b] | color_map[g] << 8 | color_map[r] << 16;
         dst[0] = (b >> 3) | ((g >> 2) << 5) | ((r >> 3) << 11);
-      } while (dst+=4, i+=4, i < right);
+      } while (dst+=colStep, i+=colStep, i < right);
     }
   } while (cw_clip_math >>= 1, ++windex < cwin.nr);
 
