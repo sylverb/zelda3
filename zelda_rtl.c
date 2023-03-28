@@ -29,7 +29,7 @@ typedef struct SimpleHdma {
 static void SimpleHdma_Init(SimpleHdma *c, DmaChannel *dc);
 static void SimpleHdma_DoLine(SimpleHdma *c);
 
-static const uint8 bAdrOffsets[8][4] = {
+static const uint8 bAdrOffsets[8][4] __attribute__((section (".dtcram_hot_data"))) = {
   {0, 0, 0, 0},
   {0, 1, 0, 1},
   {0, 0, 0, 0},
@@ -39,26 +39,26 @@ static const uint8 bAdrOffsets[8][4] = {
   {0, 0, 0, 0},
   {0, 0, 1, 1}
 };
-static const uint8 transferLength[8] = {
+static const uint8 transferLength[8] __attribute__((section (".dtcram_hot_data"))) = {
   1, 2, 2, 4, 4, 4, 2, 4
 };
-const uint16 kUpperBitmasks[] = { 0x8000, 0x4000, 0x2000, 0x1000, 0x800, 0x400, 0x200, 0x100, 0x80, 0x40, 0x20, 0x10, 8, 4, 2, 1 };
-const uint8 kLitTorchesColorPlus[] = {31, 8, 4, 0};
-const uint8 kDungeonCrystalPendantBit[13] = {0, 0, 4, 2, 0, 16, 2, 1, 64, 4, 1, 32, 8};
-const int8 kGetBestActionToPerformOnTile_x[4] = { 7, 7, -3, 16 };
-const int8 kGetBestActionToPerformOnTile_y[4] = { 6, 24, 12, 12 };
+const uint16 kUpperBitmasks[] __attribute__((section (".dtcram_hot_data"))) = { 0x8000, 0x4000, 0x2000, 0x1000, 0x800, 0x400, 0x200, 0x100, 0x80, 0x40, 0x20, 0x10, 8, 4, 2, 1 };
+const uint8 kLitTorchesColorPlus[] __attribute__((section (".dtcram_hot_data"))) = {31, 8, 4, 0};
+const uint8 kDungeonCrystalPendantBit[13] __attribute__((section (".dtcram_hot_data"))) = {0, 0, 4, 2, 0, 16, 2, 1, 64, 4, 1, 32, 8};
+const int8 kGetBestActionToPerformOnTile_x[4] __attribute__((section (".dtcram_hot_data"))) = { 7, 7, -3, 16 };
+const int8 kGetBestActionToPerformOnTile_y[4] __attribute__((section (".dtcram_hot_data"))) = { 6, 24, 12, 12 };
 #define AT_WORD(x) (uint8)(x), (x)>>8
 // direct
-static const uint8 kAttractDmaTable0[13] = {0x20, AT_WORD(0x00ff), 0x50, AT_WORD(0xe018), 0x50, AT_WORD(0xe018), 1, AT_WORD(0x00ff), 0};
-static const uint8 kAttractDmaTable1[10] = {0x48, AT_WORD(0x00ff), 0x30, AT_WORD(0xd830), 1, AT_WORD(0x00ff), 0};
-static const uint8 kHdmaTableForEnding[19] = {
+static const uint8 kAttractDmaTable0[13] __attribute__((section (".dtcram_hot_data"))) = {0x20, AT_WORD(0x00ff), 0x50, AT_WORD(0xe018), 0x50, AT_WORD(0xe018), 1, AT_WORD(0x00ff), 0};
+static const uint8 kAttractDmaTable1[10] __attribute__((section (".dtcram_hot_data"))) = {0x48, AT_WORD(0x00ff), 0x30, AT_WORD(0xd830), 1, AT_WORD(0x00ff), 0};
+static const uint8 kHdmaTableForEnding[19] __attribute__((section (".dtcram_hot_data"))) = {
   0x52, AT_WORD(0x600), 8, AT_WORD(0xe2), 8, AT_WORD(0x602), 5, AT_WORD(0x604), 0x10, AT_WORD(0x606), 0x81, AT_WORD(0xe2), 0,
 };
-static const uint8 kSpotlightIndirectHdma[7] = {0xf8, AT_WORD(0x1b00), 0xf8, AT_WORD(0x1bf0), 0};
-static const uint8 kMapModeHdma0[7] = {0xf0, AT_WORD(0xdd27), 0xf0, AT_WORD(0xde07), 0};
-static const uint8 kMapModeHdma1[7] = {0xf0, AT_WORD(0xdee7), 0xf0, AT_WORD(0xdfc7), 0};
-static const uint8 kAttractIndirectHdmaTab[7] = {0xf0, AT_WORD(0x1b00), 0xf0, AT_WORD(0x1be0), 0};
-static const uint8 kHdmaTableForPrayingScene[7] = {0xf8, AT_WORD(0x1b00), 0xf8, AT_WORD(0x1bf0), 0};
+static const uint8 kSpotlightIndirectHdma[7] __attribute__((section (".dtcram_hot_data"))) = {0xf8, AT_WORD(0x1b00), 0xf8, AT_WORD(0x1bf0), 0};
+static const uint8 kMapModeHdma0[7] __attribute__((section (".dtcram_hot_data"))) = {0xf0, AT_WORD(0xdd27), 0xf0, AT_WORD(0xde07), 0};
+static const uint8 kMapModeHdma1[7] __attribute__((section (".dtcram_hot_data"))) = {0xf0, AT_WORD(0xdee7), 0xf0, AT_WORD(0xdfc7), 0};
+static const uint8 kAttractIndirectHdmaTab[7] __attribute__((section (".dtcram_hot_data"))) = {0xf0, AT_WORD(0x1b00), 0xf0, AT_WORD(0x1be0), 0};
+static const uint8 kHdmaTableForPrayingScene[7] __attribute__((section (".dtcram_hot_data"))) = {0xf8, AT_WORD(0x1b00), 0xf8, AT_WORD(0x1bf0), 0};
 
 __attribute__((section (".text_in_ram")))
 void zelda_ppu_write(uint32_t adr, uint8_t val) {
@@ -71,6 +71,7 @@ void zelda_ppu_write_word(uint32_t adr, uint16_t val) {
   zelda_ppu_write(adr + 1, val >> 8);
 }
 
+__attribute__((section (".text_in_ram")))
 static const uint8 *SimpleHdma_GetPtr(uint32 p) {
   switch (p) {
 

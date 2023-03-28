@@ -8,7 +8,7 @@
 #include "ppu.h"
 #include "../types.h"
 
-static const uint8 kSpriteSizes[8][2] = {
+static const uint8 kSpriteSizes[8][2] __attribute__((section (".dtcram_hot_data"))) = {
   {8, 16}, {8, 32}, {8, 64}, {16, 32},
   {16, 64}, {32, 64}, {16, 32}, {16, 32}
 };
@@ -895,7 +895,7 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
   // Color window affects the drawing mode in each region
   PpuWindows cwin;
   PpuWindows_Calc(&cwin, ppu, 5);
-  static const uint8 kCwBitsMod[8] = {
+  static const uint8 kCwBitsMod[8] __attribute__((section (".dtcram_hot_data"))) = {
     0x00, 0xff, 0xff, 0x00,
     0xff, 0x00, 0xff, 0x00,
   };
@@ -1052,7 +1052,7 @@ static void ppu_handlePixel(Ppu* ppu, int x, int y) {
   */
 }
 
-static const int bitDepthsPerMode[10][4] = {
+static const int bitDepthsPerMode[10][4] __attribute__((section (".dtcram_hot_data"))) = {
   {2, 2, 2, 2},
   {4, 4, 2, 5},
   {4, 4, 5, 5},
@@ -1071,7 +1071,7 @@ static int ppu_getPixel(Ppu *ppu, int x, int y, bool sub, int *r, int *g, int *b
 //   0-7: mode 0-7; 8: mode 1 + l3prio; 9: mode 7 + extbg
 
 //   0-3; layers 1-4; 4: sprites; 5: nonexistent
-  static const int layersPerMode[10][12] __attribute__((section (".data_in_ram"))) = {
+  static const int layersPerMode[10][12] __attribute__((section (".dtcram_hot_data"))) = {
     {4, 0, 1, 4, 0, 1, 4, 2, 3, 4, 2, 3},
     {4, 0, 1, 4, 0, 1, 4, 2, 4, 2, 5, 5},
     {4, 0, 4, 1, 4, 0, 4, 1, 5, 5, 5, 5},
@@ -1084,7 +1084,7 @@ static int ppu_getPixel(Ppu *ppu, int x, int y, bool sub, int *r, int *g, int *b
     {4, 4, 1, 4, 0, 4, 1, 5, 5, 5, 5, 5}
   };
 
-  static const int prioritysPerMode[10][12] __attribute__((section (".data_in_ram"))) = {
+  static const int prioritysPerMode[10][12] __attribute__((section (".dtcram_hot_data"))) = {
     {3, 1, 1, 2, 0, 0, 1, 1, 1, 0, 0, 0},
     {3, 1, 1, 2, 0, 0, 1, 1, 0, 0, 5, 5},
     {3, 1, 2, 1, 1, 0, 0, 0, 5, 5, 5, 5},
@@ -1097,7 +1097,7 @@ static int ppu_getPixel(Ppu *ppu, int x, int y, bool sub, int *r, int *g, int *b
     {3, 2, 1, 1, 0, 0, 0, 5, 5, 5, 5, 5}
   };
 
-  static const int layerCountPerMode[10] __attribute__((section (".data_in_ram"))) = {
+  static const int layerCountPerMode[10] __attribute__((section (".dtcram_hot_data"))) = {
     12, 10, 8, 8, 8, 8, 6, 5, 10, 7
   };
 
