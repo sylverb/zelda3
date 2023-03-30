@@ -42,7 +42,7 @@ static void readHeader(uint8_t* data, int location, CartHeader* header);
 
 bool snes_loadRom(Snes* snes, uint8_t* data, int length) {
   // if smaller than smallest possible, don't load
-  if(length < 0x8000) {
+  /*if(length < 0x8000) {
     printf("Failed to load rom: rom to small (%d bytes)\n", length);
     return false;
   }
@@ -100,7 +100,7 @@ bool snes_loadRom(Snes* snes, uint8_t* data, int length) {
     newData, newLength, headers[used].chips > 0 ? headers[used].ramSize : 0
   );
   snes_reset(snes, true); // reset after loading
-  free(newData);
+  free(newData);*/
   return true;
 }
 

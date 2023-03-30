@@ -14,14 +14,15 @@ static uint8_t cart_readHirom(Cart* cart, uint8_t bank, uint16_t adr);
 static void cart_writeHirom(Cart* cart, uint8_t bank, uint16_t adr, uint8_t val);
 
 Cart* cart_init(Snes* snes) {
-  Cart* cart = (Cart *)malloc(sizeof(Cart));
+  /*Cart* cart = (Cart *)malloc(sizeof(Cart));
   cart->snes = snes;
   cart->type = 0;
   cart->rom = NULL;
   cart->romSize = 0;
   cart->ramSize = 0x2000;
   cart->ram = (uint8_t *)malloc(cart->ramSize);
-  return cart;
+  return cart;*/
+  return NULL;
 }
 
 void cart_free(Cart* cart) {
@@ -37,14 +38,14 @@ void cart_saveload(Cart *cart, SaveLoadFunc *func, void *ctx) {
 }
 
 void cart_load(Cart* cart, int type, uint8_t* rom, int romSize, int ramSize) {
-  cart->type = type;
+  /*cart->type = type;
   if(cart->rom != NULL) free(cart->rom);
   cart->rom = (uint8_t*)malloc(romSize);
   cart->romSize = romSize;
   assert(ramSize == cart->ramSize);
   memset(cart->ram, 0, ramSize);
   cart->ramSize = ramSize;
-  memcpy(cart->rom, rom, romSize);
+  memcpy(cart->rom, rom, romSize);*/
 }
 
 uint8_t cart_read(Cart* cart, uint8_t bank, uint16_t adr) {

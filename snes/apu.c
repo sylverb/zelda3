@@ -17,8 +17,10 @@ static const uint8_t bootRom[0x40] = {
   0xf6, 0xda, 0x00, 0xba, 0xf4, 0xc4, 0xf4, 0xdd, 0x5d, 0xd0, 0xdb, 0x1f, 0x00, 0x00, 0xc0, 0xff
 };
 
+static Apu g_apu;
+
 Apu* apu_init() {
-  Apu* apu = (Apu * )malloc(sizeof(Apu));
+  Apu* apu = &g_apu;//(Apu * )malloc(sizeof(Apu));
   apu->spc = spc_init(apu);
   apu->dsp = dsp_init(apu->ram);
   return apu;

@@ -25,7 +25,7 @@ static uint8_t snes_rread(Snes* snes, uint32_t adr); // wrapped by read, to set 
 static int snes_getAccessTime(Snes* snes, uint32_t adr);
 
 Snes* snes_init(uint8_t *ram) {
-  Snes* snes = (Snes * )malloc(sizeof(Snes));
+  /*Snes* snes = (Snes * )malloc(sizeof(Snes));
   snes->ram = ram;
   snes->cpu = cpu_init(snes, 0);
   snes->apu = apu_init();
@@ -36,7 +36,8 @@ Snes* snes_init(uint8_t *ram) {
   snes->input2 = input_init(snes);
   snes->debug_cycles = false;
   snes->disableHpos = false;
-  return snes;
+  return snes;*/
+  return NULL;
 }
 
 void snes_free(Snes* snes) {

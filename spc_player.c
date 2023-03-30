@@ -147,6 +147,8 @@ static const MemMapSized kSpcPlayer_Maps[] = {
   {offsetof(SpcPlayer, cutk_always_zero), 0x3ff, 1},
 };
 
+static SpcPlayer g_spcPlayer;
+
 static void PlayNote(SpcPlayer *p, Channel *c, uint8 note);
 
 static void Dsp_Write(SpcPlayer *p, uint8_t reg, uint8 value) {
@@ -1188,7 +1190,7 @@ static void Interrupt_Reset(SpcPlayer *p) {
 }
 
 SpcPlayer *SpcPlayer_Create() {
-  SpcPlayer *p = (SpcPlayer *)malloc(sizeof(SpcPlayer));
+  SpcPlayer *p = &g_spcPlayer;  //(SpcPlayer *)malloc(sizeof(SpcPlayer));
   p->dsp = dsp_init(p->ram);
   p->reg_write_history = 0;
   return p;

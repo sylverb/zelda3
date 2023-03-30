@@ -53,6 +53,8 @@ static const int gaussValues[512] = {
   0x513, 0x514, 0x514, 0x515, 0x516, 0x516, 0x517, 0x517, 0x517, 0x518, 0x518, 0x518, 0x518, 0x518, 0x519, 0x519
 };
 
+static Dsp g_dsp;
+
 static void dsp_cycleChannel(Dsp* dsp, int ch);
 static void dsp_handleEcho(Dsp* dsp, int* outputL, int* outputR);
 static void dsp_handleGain(Dsp* dsp, int ch);
@@ -61,7 +63,7 @@ static int16_t dsp_getSample(Dsp* dsp, int ch, int sampleNum, int offset);
 static void dsp_handleNoise(Dsp* dsp);
 
 Dsp* dsp_init(uint8_t *apu_ram) {
-  Dsp* dsp = (Dsp*)malloc(sizeof(Dsp));
+  Dsp* dsp = &g_dsp;//(Dsp*)malloc(sizeof(Dsp));
   dsp->apu_ram = apu_ram;
   return dsp;
 }

@@ -13,6 +13,7 @@
 
 ZeldaEnv g_zenv;
 uint8 g_ram[131072];
+uint8 g_sram[8192];
 
 uint32 g_wanted_zelda_features;
 
@@ -29,7 +30,7 @@ typedef struct SimpleHdma {
 static void SimpleHdma_Init(SimpleHdma *c, DmaChannel *dc);
 static void SimpleHdma_DoLine(SimpleHdma *c);
 
-static const uint8 bAdrOffsets[8][4] __attribute__((section (".dtcram_hot_data"))) = {
+static const uint8 bAdrOffsets[8][4] = {
   {0, 0, 0, 0},
   {0, 1, 0, 1},
   {0, 0, 0, 0},
@@ -39,28 +40,27 @@ static const uint8 bAdrOffsets[8][4] __attribute__((section (".dtcram_hot_data")
   {0, 0, 0, 0},
   {0, 0, 1, 1}
 };
-static const uint8 transferLength[8] __attribute__((section (".dtcram_hot_data"))) = {
+static const uint8 transferLength[8] = {
   1, 2, 2, 4, 4, 4, 2, 4
 };
-const uint16 kUpperBitmasks[] __attribute__((section (".dtcram_hot_data"))) = { 0x8000, 0x4000, 0x2000, 0x1000, 0x800, 0x400, 0x200, 0x100, 0x80, 0x40, 0x20, 0x10, 8, 4, 2, 1 };
-const uint8 kLitTorchesColorPlus[] __attribute__((section (".dtcram_hot_data"))) = {31, 8, 4, 0};
-const uint8 kDungeonCrystalPendantBit[13] __attribute__((section (".dtcram_hot_data"))) = {0, 0, 4, 2, 0, 16, 2, 1, 64, 4, 1, 32, 8};
-const int8 kGetBestActionToPerformOnTile_x[4] __attribute__((section (".dtcram_hot_data"))) = { 7, 7, -3, 16 };
-const int8 kGetBestActionToPerformOnTile_y[4] __attribute__((section (".dtcram_hot_data"))) = { 6, 24, 12, 12 };
+const uint16 kUpperBitmasks[] = { 0x8000, 0x4000, 0x2000, 0x1000, 0x800, 0x400, 0x200, 0x100, 0x80, 0x40, 0x20, 0x10, 8, 4, 2, 1 };
+const uint8 kLitTorchesColorPlus[] = {31, 8, 4, 0};
+const uint8 kDungeonCrystalPendantBit[13] = {0, 0, 4, 2, 0, 16, 2, 1, 64, 4, 1, 32, 8};
+const int8 kGetBestActionToPerformOnTile_x[4] = { 7, 7, -3, 16 };
+const int8 kGetBestActionToPerformOnTile_y[4] = { 6, 24, 12, 12 };
 #define AT_WORD(x) (uint8)(x), (x)>>8
 // direct
-static const uint8 kAttractDmaTable0[13] __attribute__((section (".dtcram_hot_data"))) = {0x20, AT_WORD(0x00ff), 0x50, AT_WORD(0xe018), 0x50, AT_WORD(0xe018), 1, AT_WORD(0x00ff), 0};
-static const uint8 kAttractDmaTable1[10] __attribute__((section (".dtcram_hot_data"))) = {0x48, AT_WORD(0x00ff), 0x30, AT_WORD(0xd830), 1, AT_WORD(0x00ff), 0};
-static const uint8 kHdmaTableForEnding[19] __attribute__((section (".dtcram_hot_data"))) = {
+static const uint8 kAttractDmaTable0[13] = {0x20, AT_WORD(0x00ff), 0x50, AT_WORD(0xe018), 0x50, AT_WORD(0xe018), 1, AT_WORD(0x00ff), 0};
+static const uint8 kAttractDmaTable1[10] = {0x48, AT_WORD(0x00ff), 0x30, AT_WORD(0xd830), 1, AT_WORD(0x00ff), 0};
+static const uint8 kHdmaTableForEnding[19] = {
   0x52, AT_WORD(0x600), 8, AT_WORD(0xe2), 8, AT_WORD(0x602), 5, AT_WORD(0x604), 0x10, AT_WORD(0x606), 0x81, AT_WORD(0xe2), 0,
 };
-static const uint8 kSpotlightIndirectHdma[7] __attribute__((section (".dtcram_hot_data"))) = {0xf8, AT_WORD(0x1b00), 0xf8, AT_WORD(0x1bf0), 0};
-static const uint8 kMapModeHdma0[7] __attribute__((section (".dtcram_hot_data"))) = {0xf0, AT_WORD(0xdd27), 0xf0, AT_WORD(0xde07), 0};
-static const uint8 kMapModeHdma1[7] __attribute__((section (".dtcram_hot_data"))) = {0xf0, AT_WORD(0xdee7), 0xf0, AT_WORD(0xdfc7), 0};
-static const uint8 kAttractIndirectHdmaTab[7] __attribute__((section (".dtcram_hot_data"))) = {0xf0, AT_WORD(0x1b00), 0xf0, AT_WORD(0x1be0), 0};
-static const uint8 kHdmaTableForPrayingScene[7] __attribute__((section (".dtcram_hot_data"))) = {0xf8, AT_WORD(0x1b00), 0xf8, AT_WORD(0x1bf0), 0};
+static const uint8 kSpotlightIndirectHdma[7] = {0xf8, AT_WORD(0x1b00), 0xf8, AT_WORD(0x1bf0), 0};
+static const uint8 kMapModeHdma0[7] = {0xf0, AT_WORD(0xdd27), 0xf0, AT_WORD(0xde07), 0};
+static const uint8 kMapModeHdma1[7] = {0xf0, AT_WORD(0xdee7), 0xf0, AT_WORD(0xdfc7), 0};
+static const uint8 kAttractIndirectHdmaTab[7] = {0xf0, AT_WORD(0x1b00), 0xf0, AT_WORD(0x1be0), 0};
+static const uint8 kHdmaTableForPrayingScene[7] = {0xf8, AT_WORD(0x1b00), 0xf8, AT_WORD(0x1bf0), 0};
 
-__attribute__((section (".text_in_ram")))
 void zelda_ppu_write(uint32_t adr, uint8_t val) {
   assert(adr >= INIDISP && adr <= STAT78);
   ppu_write(g_zenv.ppu, (uint8)adr, val);
@@ -71,7 +71,6 @@ void zelda_ppu_write_word(uint32_t adr, uint16_t val) {
   zelda_ppu_write(adr + 1, val >> 8);
 }
 
-__attribute__((section (".text_in_ram")))
 static const uint8 *SimpleHdma_GetPtr(uint32 p) {
   switch (p) {
 
@@ -102,7 +101,6 @@ static const uint8 *SimpleHdma_GetPtr(uint32 p) {
   }
 }
 
-__attribute__((section (".text_in_ram")))
 static void SimpleHdma_Init(SimpleHdma *c, DmaChannel *dc) {
   if (!dc->hdmaActive) {
     c->table = 0;
@@ -115,7 +113,6 @@ static void SimpleHdma_Init(SimpleHdma *c, DmaChannel *dc) {
   c->indir_bank = dc->indBank;
 }
 
-__attribute__((section (".text_in_ram")))
 static void SimpleHdma_DoLine(SimpleHdma *c) {
   if (c->table == NULL)
     return;
@@ -141,7 +138,6 @@ static void SimpleHdma_DoLine(SimpleHdma *c) {
   c->rep_count--;
 }
 
-__attribute__((section (".text_in_ram")))
 static void ConfigurePpuSideSpace() {
   // Let PPU impl know about the maximum allowed extra space on the sides and bottom
   int extra_right = 0, extra_left = 0, extra_bottom = 0;
@@ -177,7 +173,6 @@ static void ConfigurePpuSideSpace() {
   PpuSetExtraSideSpace(g_zenv.ppu, extra_left, extra_right, extra_bottom);
 }
 
-__attribute__((section (".text_in_ram")))
 void ZeldaDrawPpuFrame(uint8 *pixel_buffer, size_t pitch, uint32 render_flags) {
   SimpleHdma hdma_chans[2];
 
@@ -225,7 +220,6 @@ void ZeldaDrawPpuFrame(uint8 *pixel_buffer, size_t pitch, uint32 render_flags) {
   }
 }
 
-__attribute__((section (".text_in_ram")))
 void HdmaSetup(uint32 addr6, uint32 addr7, uint8 transfer_unit, uint8 reg6, uint8 reg7, uint8 indirect_bank) {
   Dma *dma = g_zenv.dma;
   if (addr6) {
@@ -276,7 +270,7 @@ void ZeldaInitialize() {
   g_zenv.dma = dma_init(NULL);
   g_zenv.ppu = ppu_init(NULL);
   g_zenv.ram = g_ram;
-  g_zenv.sram = (uint8*)calloc(8192, 1);
+  g_zenv.sram = g_sram; //(uint8*)calloc(8192, 1);
   g_zenv.vram = g_zenv.ppu->vram;
   g_zenv.player = SpcPlayer_Create();
   SpcPlayer_Initialize(g_zenv.player);
@@ -350,6 +344,7 @@ static void Startup_InitializeMemory() {  // 8087c0
   flag_update_cgram_in_nmi++;
 }
 
+/*
 void ByteArray_AppendVl(ByteArray *arr, uint32 v) {
   for (; v >= 255; v -= 255)
     ByteArray_AppendByte(arr, 255);
@@ -359,6 +354,7 @@ void ByteArray_AppendVl(ByteArray *arr, uint32 v) {
 void saveFunc(void *ctx_in, void *data, size_t data_size) {
   ByteArray_AppendData((ByteArray *)ctx_in, data, data_size);
 }
+*/
 
 typedef struct LoadFuncState {
   uint8 *p, *pend;
@@ -419,6 +415,7 @@ static void SaveSnesState(SaveLoadFunc *func, void *ctx) {
   ZeldaApuUnlock();
 }
 
+/*
 typedef struct StateRecorder {
   uint16 last_inputs;
   uint32 frames_since_last;
@@ -693,6 +690,7 @@ int InputStateReadFromFile() {
   return cur_keys;
 }
 #endif
+*/
 
 bool ZeldaRunFrame(int inputs) {
 
@@ -702,21 +700,21 @@ bool ZeldaRunFrame(int inputs) {
 
   frame_ctr_dbg++;
 
-  bool is_replay = state_recorder.replay_mode;
+  //bool is_replay = state_recorder.replay_mode;
 
   // Either copy state or apply state
-  if (is_replay) {
-    inputs = StateRecorder_ReadNextReplayState(&state_recorder);
-  } else {
+  //if (is_replay) {
+  //  inputs = StateRecorder_ReadNextReplayState(&state_recorder);
+  //} else {
     //    input_state = InputStateReadFromFile();
-    StateRecorder_Record(&state_recorder, inputs);
+    //StateRecorder_Record(&state_recorder, inputs);
 
     // This is whether APUI00 is true or false, this is used by the ancilla code.
     uint8 apui00 = ZeldaIsMusicPlaying();
     if (apui00 != g_ram[kRam_APUI00]) {
       g_ram[kRam_APUI00] = apui00;
       EmuSyncMemoryRegion(&g_ram[kRam_APUI00], 1);
-      StateRecorder_RecordPatchByte(&state_recorder, 0x648, &apui00, 1);
+      //StateRecorder_RecordPatchByte(&state_recorder, 0x648, &apui00, 1);
     }
 
     if (animated_tile_data_src != 0) {
@@ -725,16 +723,16 @@ bool ZeldaRunFrame(int inputs) {
       if (g_ram[kRam_BugsFixed] < kBugFix_Latest) {
         g_ram[kRam_BugsFixed] = kBugFix_Latest;
         EmuSyncMemoryRegion(&g_ram[kRam_BugsFixed], 1);
-        StateRecorder_RecordPatchByte(&state_recorder, kRam_BugsFixed, &g_ram[kRam_BugsFixed], 1);
+        //StateRecorder_RecordPatchByte(&state_recorder, kRam_BugsFixed, &g_ram[kRam_BugsFixed], 1);
       }
 
       if (enhanced_features0 != g_wanted_zelda_features) {
         enhanced_features0 = g_wanted_zelda_features;
         EmuSyncMemoryRegion(&enhanced_features0, sizeof(enhanced_features0));
-        StateRecorder_RecordPatchByte(&state_recorder, kRam_Features0, (uint8 *)&enhanced_features0, 4);
+        //StateRecorder_RecordPatchByte(&state_recorder, kRam_Features0, (uint8 *)&enhanced_features0, 4);
       }
     }
-  }
+  //}
 
   int run_what;
   if (g_ram[kRam_BugsFixed] < kBugFix_PolyRenderer) {
@@ -758,7 +756,7 @@ bool ZeldaRunFrame(int inputs) {
 
   ZeldaPushApuState();
 
-  return is_replay;
+  return false;//is_replay;
 }
 
 
@@ -794,15 +792,17 @@ void SaveLoadSlot(int cmd, int which) {
     printf("*** %s slot %d\n",
       cmd == kSaveLoad_Save ? "Saving" : cmd == kSaveLoad_Load ? "Loading" : "Replaying", which);
 
+    /*
     if (cmd != kSaveLoad_Save)
       StateRecorder_Load(&state_recorder, f, cmd == kSaveLoad_Replay);
     else
-      StateRecorder_Save(&state_recorder, f);
+      StateRecorder_Save(&state_recorder, f);*/
 
     fclose(f);
   }
 }
 
+/*
 typedef struct StateRecoderMultiPatch {
   uint32 count;
   uint32 addr;
@@ -855,7 +855,7 @@ void PatchCommand(char c) {
   }
   StateRecoderMultiPatch_Commit(&mp);
 }
-
+*/
 
 void ZeldaReadSram() {
   FILE *f = fopen("saves/sram.dat", "rb");

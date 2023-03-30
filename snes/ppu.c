@@ -8,7 +8,7 @@
 #include "ppu.h"
 #include "../types.h"
 
-static const uint8 kSpriteSizes[8][2] __attribute__((section (".dtcram_hot_data"))) = {
+static const uint8 kSpriteSizes[8][2] = {
   {8, 16}, {8, 32}, {8, 64}, {16, 32},
   {16, 64}, {32, 64}, {16, 32}, {16, 32}
 };
@@ -33,7 +33,7 @@ enum {
   kWindow2Enabled = 8,
 };
 
-static Ppu g_ppu __attribute__((section (".dtcram_hot_bss")));
+static Ppu g_ppu;
 
 Ppu* ppu_init() {
   // Static allocation
@@ -125,14 +125,12 @@ void ppu_saveload(Ppu *ppu, SaveLoadFunc *func, void *ctx) {
   func(ctx, tmp, 123);
 }
 
-__attribute__((section (".text_in_ram")))
 int PpuGetCurrentRenderScale(Ppu *ppu, uint32_t render_flags) {
   bool hq = ppu->mode == 7 && !ppu->forcedBlank &&
     (render_flags & (kPpuRenderFlags_4x4Mode7 | kPpuRenderFlags_NewRenderer)) == (kPpuRenderFlags_4x4Mode7 | kPpuRenderFlags_NewRenderer);
   return hq ? 4 : 1;
 }
 
-__attribute__((section (".text_in_ram")))
 void PpuBeginDrawing(Ppu *ppu, uint8_t *pixels, size_t pitch, uint32_t render_flags) {
   ppu->renderFlags = render_flags;
   ppu->renderPitch = (uint)pitch;
@@ -157,14 +155,12 @@ void PpuBeginDrawing(Ppu *ppu, uint8_t *pixels, size_t pitch, uint32_t render_fl
   }
 }
 
-__attribute__((section (".text_in_ram")))
 static inline void ClearBackdrop(PpuPixelPrioBufs *buf) {
   for (size_t i = 0; i != countof(buf->data); i += 4)
     *(uint64*)&buf->data[i] = 0x0500050005000500;
 }
 
 
-__attribute__((section (".text_in_ram")))
 void ppu_runLine(Ppu *ppu, int line) {
   if(line != 0) {
     if (ppu->mosaicSize != ppu->lastMosaicModulo) {
@@ -212,7 +208,6 @@ typedef struct PpuWindows {
   uint8 bits;
 } PpuWindows;
 
-__attribute__((section (".text_in_ram")))
 static void PpuWindows_Clear(PpuWindows *win, Ppu *ppu, uint layer) {
   win->edges[0] = -(layer != 2 ? ppu->extraLeftCur : 0);
   win->edges[1] = 256 + (layer != 2 ? ppu->extraRightCur : 0);
@@ -220,7 +215,6 @@ static void PpuWindows_Clear(PpuWindows *win, Ppu *ppu, uint layer) {
   win->bits = 0;
 }
 
-__attribute__((section (".text_in_ram")))
 static void PpuWindows_Calc(PpuWindows *win, Ppu *ppu, uint layer) {
   // Evaluate which spans to render based on the window settings.
   // There are at most 5 windows.
@@ -283,7 +277,6 @@ static void PpuWindows_Calc(PpuWindows *win, Ppu *ppu, uint layer) {
 }
 
 // Draw a whole line of a 4bpp background layer into bgBuffers
-__attribute__((section (".text_in_ram")))
 static void PpuDrawBackground_4bpp(Ppu *ppu, uint y, bool sub, uint layer, PpuZbufType zhi, PpuZbufType zlo) {
 #define DO_PIXEL(i) do { \
   pixel = (bits >> i) & 1 | (bits >> (7 + i)) & 2 | (bits >> (14 + i)) & 4 | (bits >> (21 + i)) & 8; \
@@ -382,7 +375,6 @@ static void PpuDrawBackground_4bpp(Ppu *ppu, uint y, bool sub, uint layer, PpuZb
 }
 
 // Draw a whole line of a 2bpp background layer into bgBuffers
-__attribute__((section (".text_in_ram")))
 static void PpuDrawBackground_2bpp(Ppu *ppu, uint y, bool sub, uint layer, PpuZbufType zhi, PpuZbufType zlo) {
 #define DO_PIXEL(i) do { \
   pixel = (bits >> i) & 1 | (bits >> (7 + i)) & 2; \
@@ -484,7 +476,6 @@ static void PpuDrawBackground_2bpp(Ppu *ppu, uint y, bool sub, uint layer, PpuZb
 }
 
 // Draw a whole line of a 4bpp background layer into bgBuffers, with mosaic applied
-__attribute__((section (".text_in_ram")))
 static void PpuDrawBackground_4bpp_mosaic(Ppu *ppu, uint y, bool sub, uint layer, PpuZbufType zhi, PpuZbufType zlo) {
 #define GET_PIXEL() pixel = (bits) & 1 | (bits >> 7) & 2 | (bits >> 14) & 4 | (bits >> 21) & 8
 #define GET_PIXEL_HFLIP() pixel = (bits >> 7) & 1 | (bits >> 14) & 2 | (bits >> 21) & 4 | (bits >> 28) & 8
@@ -544,7 +535,6 @@ static void PpuDrawBackground_4bpp_mosaic(Ppu *ppu, uint y, bool sub, uint layer
 }
 
 // Draw a whole line of a 2bpp background layer into bgBuffers, with mosaic applied
-__attribute__((section (".text_in_ram")))
 static void PpuDrawBackground_2bpp_mosaic(Ppu *ppu, int y, bool sub, uint layer, PpuZbufType zhi, PpuZbufType zlo) {
 #define GET_PIXEL() pixel = (bits) & 1 | (bits >> 7) & 2
 #define GET_PIXEL_HFLIP() pixel = (bits >> 7) & 1 | (bits >> 14) & 2
@@ -608,7 +598,6 @@ static void PpuDrawBackground_2bpp_mosaic(Ppu *ppu, int y, bool sub, uint layer,
 #define SPRITE_PRIO_TO_PRIO(prio, level6) (((prio) * 4 + 2) * 16 + 4 + (level6 ? 2 : 0))
 #define SPRITE_PRIO_TO_PRIO_HI(prio) ((prio) * 4 + 2)
 
-__attribute__((section (".text_in_ram")))
 static void PpuDrawSprites(Ppu *ppu, uint y, uint sub, bool clear_backdrop) {
   int layer = 4;
   if (!IS_SCREEN_ENABLED(ppu, sub, layer))
@@ -816,7 +805,6 @@ static void PpuDrawMode7Upsampled(Ppu *ppu, uint y) {
 #undef DRAW_PIXEL
 }
 
-__attribute__((section (".text_in_ram")))
 static void PpuDrawBackgrounds(Ppu *ppu, int y, bool sub) {
 // Top 4 bits contain the prio level, and bottom 4 bits the layer type.
 // SPRITE_PRIO_TO_PRIO can be used to convert from obj prio to this prio.
@@ -859,7 +847,6 @@ static void PpuDrawBackgrounds(Ppu *ppu, int y, bool sub) {
   }
 }
 
-__attribute__((section (".text_in_ram")))
 static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
   if (ppu->forcedBlank) {
     uint8 *dst = &ppu->renderBuffer[(y - 1) * ppu->renderPitch];
@@ -895,7 +882,7 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
   // Color window affects the drawing mode in each region
   PpuWindows cwin;
   PpuWindows_Calc(&cwin, ppu, 5);
-  static const uint8 kCwBitsMod[8] __attribute__((section (".dtcram_hot_data"))) = {
+  static const uint8 kCwBitsMod[8] = {
     0x00, 0xff, 0xff, 0x00,
     0xff, 0x00, 0xff, 0x00,
   };
@@ -983,7 +970,6 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
         sizeof(uint16_t) * (ppu->extraLeftRight - ppu->extraRightCur));
 }
 
-__attribute__((section (".text_in_ram")))
 static void ppu_handlePixel(Ppu* ppu, int x, int y) {
   int r = 0, r2 = 0;
   int g = 0, g2 = 0;
@@ -1052,7 +1038,7 @@ static void ppu_handlePixel(Ppu* ppu, int x, int y) {
   */
 }
 
-static const int bitDepthsPerMode[10][4] __attribute__((section (".dtcram_hot_data"))) = {
+static const int bitDepthsPerMode[10][4] = {
   {2, 2, 2, 2},
   {4, 4, 2, 5},
   {4, 4, 5, 5},
@@ -1065,13 +1051,12 @@ static const int bitDepthsPerMode[10][4] __attribute__((section (".dtcram_hot_da
   {8, 7, 5, 5}
 };
 
-__attribute__((section (".text_in_ram")))
 static int ppu_getPixel(Ppu *ppu, int x, int y, bool sub, int *r, int *g, int *b) {
   // array for layer definitions per mode:
 //   0-7: mode 0-7; 8: mode 1 + l3prio; 9: mode 7 + extbg
 
 //   0-3; layers 1-4; 4: sprites; 5: nonexistent
-  static const int layersPerMode[10][12] __attribute__((section (".dtcram_hot_data"))) = {
+  static const int layersPerMode[10][12] = {
     {4, 0, 1, 4, 0, 1, 4, 2, 3, 4, 2, 3},
     {4, 0, 1, 4, 0, 1, 4, 2, 4, 2, 5, 5},
     {4, 0, 4, 1, 4, 0, 4, 1, 5, 5, 5, 5},
@@ -1084,7 +1069,7 @@ static int ppu_getPixel(Ppu *ppu, int x, int y, bool sub, int *r, int *g, int *b
     {4, 4, 1, 4, 0, 4, 1, 5, 5, 5, 5, 5}
   };
 
-  static const int prioritysPerMode[10][12] __attribute__((section (".dtcram_hot_data"))) = {
+  static const int prioritysPerMode[10][12] = {
     {3, 1, 1, 2, 0, 0, 1, 1, 1, 0, 0, 0},
     {3, 1, 1, 2, 0, 0, 1, 1, 0, 0, 5, 5},
     {3, 1, 2, 1, 1, 0, 0, 0, 5, 5, 5, 5},
@@ -1097,7 +1082,7 @@ static int ppu_getPixel(Ppu *ppu, int x, int y, bool sub, int *r, int *g, int *b
     {3, 2, 1, 1, 0, 0, 0, 5, 5, 5, 5, 5}
   };
 
-  static const int layerCountPerMode[10] __attribute__((section (".dtcram_hot_data"))) = {
+  static const int layerCountPerMode[10] = {
     12, 10, 8, 8, 8, 8, 6, 5, 10, 7
   };
 
@@ -1162,7 +1147,6 @@ static int ppu_getPixel(Ppu *ppu, int x, int y, bool sub, int *r, int *g, int *b
 }
 
 
-__attribute__((section (".text_in_ram")))
 static int ppu_getPixelForBgLayer(Ppu *ppu, int x, int y, int layer, bool priority) {
   BgLayer *layerp = &ppu->bgLayer[layer];
   // figure out address of tilemap word and read it
@@ -1263,7 +1247,6 @@ static int ppu_getPixelForMode7(Ppu* ppu, int x, int layer, bool priority) {
   return pixel;
 }
 
-__attribute__((section (".text_in_ram")))
 static bool ppu_getWindowState(Ppu* ppu, int layer, int x) {
   uint32 winflags = GET_WINDOW_FLAGS(ppu, layer);
   if (!(winflags & kWindow1Enabled) && !(winflags & kWindow2Enabled)) {
@@ -1284,7 +1267,6 @@ static bool ppu_getWindowState(Ppu* ppu, int layer, int x) {
   return test1 || test2;
 }
 
-__attribute__((section (".text_in_ram")))
 static bool ppu_evaluateSprites(Ppu* ppu, int line) {
   // TODO: iterate over oam normally to determine in-range sprites,
   //   then iterate those in-range sprites in reverse for tile-fetching
@@ -1357,7 +1339,6 @@ static bool ppu_evaluateSprites(Ppu* ppu, int line) {
   return (tilesLeft != tilesLeftOrg);
 }
 
-__attribute__((section (".text_in_ram")))
 uint8_t ppu_read(Ppu* ppu, uint8_t adr) {
   switch (adr) {
   case 0x34:
@@ -1370,7 +1351,6 @@ uint8_t ppu_read(Ppu* ppu, uint8_t adr) {
   return 0xff;
 }
 
-__attribute__((section (".text_in_ram")))
 void ppu_write(Ppu* ppu, uint8_t adr, uint8_t val) {
   switch(adr) {
     case 0x00: {  // INIDISP

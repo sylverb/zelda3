@@ -188,6 +188,7 @@ void RunEmulatedFunc(uint32 pc, uint16 a, uint16 x, uint16 y, bool mf, bool xf, 
   g_snes->debug_cycles = 0;
 }
 
+/*
 void RunEmulatedFuncSilent(uint32 pc, uint16 a, uint16 x, uint16 y, bool mf, bool xf, int b, int whatflags) {
   uint16 org_sp = g_cpu->sp;
   uint16 org_pc = g_cpu->pc;
@@ -230,7 +231,7 @@ void RunEmulatedFuncSilent(uint32 pc, uint16 a, uint16 x, uint16 y, bool mf, boo
         char line[80];
         getProcessorStateSpc(g_snes->apu, line);
         puts(line);
-      }*/
+      }*//*
 //      apu_cycle(g_snes->apu);
     }
   }
@@ -242,6 +243,7 @@ void RunEmulatedFuncSilent(uint32 pc, uint16 a, uint16 x, uint16 y, bool mf, boo
   memcpy(g_ram, g_emulated_ram, 0x20000);
   memcpy(g_emulated_ram, rambak, 0x20000);
 }
+*/
 
 void RunOrigAsmCodeOneLoop(Snes *snes) {
   Cpu *cpu = snes->cpu;
