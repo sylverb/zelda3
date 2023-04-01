@@ -54,11 +54,13 @@ typedef struct Apu2 {
 } Apu2;
 
 Apu* apu_init();
+/*
 void apu_free(Apu* apu);
 void apu_reset(Apu* apu);
 void apu_cycle(Apu* apu);
 uint8_t apu_cpuRead(Apu* apu, uint16_t adr);
 void apu_cpuWrite(Apu* apu, uint16_t adr, uint8_t val);
 void apu_saveload(Apu *apu, SaveLoadFunc *func, void *ctx);
+*/
 
 #endif

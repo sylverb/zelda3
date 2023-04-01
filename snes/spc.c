@@ -27,7 +27,7 @@ static const int cyclesPerOpcode[256] = {
   2, 8, 4, 5, 4, 5, 5, 6, 3, 4, 5, 4, 2, 2, 4, 3
 };
 
-static Spc g_spc;
+//static Spc g_spc;
 
 static uint8_t spc_read(Spc* spc, uint16_t adr);
 static void spc_write(Spc* spc, uint16_t adr, uint8_t val);
@@ -58,9 +58,10 @@ static void spc_write(Spc* spc, uint16_t adr, uint8_t val) {
 }
 
 Spc* spc_init(Apu* apu) {
-  Spc* spc = &g_spc;//(Spc * )malloc(sizeof(Spc));
+  /*Spc* spc = &g_spc;//(Spc * )malloc(sizeof(Spc));
   spc->apu = apu;
-  return spc;
+  return spc;*/
+  return NULL;
 }
 
 void spc_free(Spc* spc) {

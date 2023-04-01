@@ -41,7 +41,7 @@ typedef struct MsuPlayer {
   int16 buffer[960 * 2];
 } MsuPlayer;
 
-static MsuPlayer g_msu_player;
+//static MsuPlayer g_msu_player;
 
 static void MsuPlayer_Open(MsuPlayer *mp, int orig_track, bool resume_from_snapshot);
 
@@ -100,23 +100,25 @@ static uint8 RemapMsuDeluxeTrack(MsuPlayer *mp, uint8 track) {
 }
 
 bool ZeldaIsPlayingMusicTrack(uint8 track) {
-  MsuPlayer *mp = &g_msu_player;
+  /*MsuPlayer *mp = &g_msu_player;
   if (mp->state != kMsuState_Idle && mp->enabled & kMsuEnabled_MsuDeluxe)
     return RemapMsuDeluxeTrack(mp, track) == mp->resume_info.actual_track;
   else
-    return track == music_unk1;
+    return track == music_unk1;*/
+  return false;
 }
 
 bool ZeldaIsPlayingMusicTrackWithBug(uint8 track) {
-  MsuPlayer *mp = &g_msu_player;
+  /*MsuPlayer *mp = &g_msu_player;
   if (mp->state != kMsuState_Idle && mp->enabled & kMsuEnabled_MsuDeluxe)
     return RemapMsuDeluxeTrack(mp, track) == mp->resume_info.actual_track;
   else
-    return track == (enhanced_features0 & kFeatures0_MiscBugFixes ? music_unk1 : last_music_control);
+    return track == (enhanced_features0 & kFeatures0_MiscBugFixes ? music_unk1 : last_music_control);*/
+  return false;
 }
 
 uint8 ZeldaGetEntranceMusicTrack(int i) {
-  MsuPlayer *mp = &g_msu_player;
+  /*MsuPlayer *mp = &g_msu_player;
   uint8 rv = kEntranceData_musicTrack[i];
 
   // For some entrances the original performs a fade out, while msu deluxe has new tracks.
@@ -125,7 +127,8 @@ uint8 ZeldaGetEntranceMusicTrack(int i) {
       rv = 16;
   }
 
-  return rv;
+  return rv;*/
+  return NULL;
 }
 
 static const uint8 kVolumeTransitionTarget[4] = { 0, 64, 255, 255};
@@ -135,7 +138,7 @@ static float kVolumeTransitionStepFloat[4];
 static float kVolumeTransitionTargetFloat[4];
 
 void ZeldaPlayMsuAudioTrack(uint8 music_ctrl) {
-  MsuPlayer *mp = &g_msu_player;
+  /*MsuPlayer *mp = &g_msu_player;
   if (!mp->enabled) {
     mp->resume_info.tag = 0;
     zelda_apu_write(APUI00, music_ctrl);
@@ -154,7 +157,7 @@ void ZeldaPlayMsuAudioTrack(uint8 music_ctrl) {
   } else {
     zelda_apu_write(APUI00, 0xf0);  // pause spc player
   }
-  ZeldaApuUnlock();
+  ZeldaApuUnlock();*/
 }
 
 static void MsuPlayer_CloseFile(MsuPlayer *mp) {
@@ -416,19 +419,19 @@ void ZeldaPushApuState() {
 }
 
 static void ZeldaPopApuState() {
-  if (g_apu_write_count != 0)
-    memcpy(g_zenv.player->input_ports, &g_apu_write_ents[(g_apu_write_ent_pos - g_apu_write_count--) & 0xf], 4);
+  /*if (g_apu_write_count != 0)
+    memcpy(g_zenv.player->input_ports, &g_apu_write_ents[(g_apu_write_ent_pos - g_apu_write_count--) & 0xf], 4);*/
 }
 
 void ZeldaDiscardUnusedAudioFrames() {
-  if (g_apu_write_count != 0 && memcmp(g_zenv.player->input_ports, &g_apu_write_ents[(g_apu_write_ent_pos - g_apu_write_count) & 0xf], 4) == 0) {
+  /*if (g_apu_write_count != 0 && memcmp(g_zenv.player->input_ports, &g_apu_write_ents[(g_apu_write_ent_pos - g_apu_write_count) & 0xf], 4) == 0) {
     if (g_apu_total_write >= 16) {
       g_apu_total_write = 14;
       g_apu_write_count--;
     }
   } else {
     g_apu_total_write = 0;
-  }
+  }*/
 }
 
 static void ZeldaResetApuQueue() {
@@ -444,30 +447,32 @@ uint8_t zelda_read_apui00() {
 }
 
 uint8_t zelda_apu_read(uint32_t adr) {
-  return g_zenv.player->port_to_snes[adr & 0x3];
+  //return g_zenv.player->port_to_snes[adr & 0x3];
+  return NULL;
 }
 
 void ZeldaRenderAudio(int16 *audio_buffer, int samples, int channels) {
-  ZeldaApuLock();
+  /*ZeldaApuLock();
   ZeldaPopApuState();
   SpcPlayer_GenerateSamples(g_zenv.player);
   dsp_getSamples(g_zenv.player->dsp, audio_buffer, samples, channels);
   if (g_msu_player.f && channels == 2)
     MsuPlayer_Mix(&g_msu_player, audio_buffer, samples);
-  ZeldaApuUnlock();
+  ZeldaApuUnlock();*/
 }
 
 bool ZeldaIsMusicPlaying() {
-  if (g_msu_player.state != kMsuState_Idle) {
+  /*if (g_msu_player.state != kMsuState_Idle) {
     return g_msu_player.state != kMsuState_FinishedPlaying;
   } else {
     return g_zenv.player->port_to_snes[0] != 0;
-  }
+  }*/
+  return false;
 }
 
 void ZeldaRestoreMusicAfterLoad_Locked(bool is_reset) {
   // Restore spc variables from the ram dump.
-  SpcPlayer_CopyVariablesFromRam(g_zenv.player);
+  /*SpcPlayer_CopyVariablesFromRam(g_zenv.player);
   // This is not stored in the snapshot
   g_zenv.player->timer_cycles = 0;
 
@@ -500,12 +505,12 @@ void ZeldaRestoreMusicAfterLoad_Locked(bool is_reset) {
 
     if (g_msu_player.state)
       zelda_apu_write(APUI00, 0xf0);  // pause spc player
-  }
+  }*/
   ZeldaResetApuQueue();
 }
 
 void ZeldaSaveMusicStateToRam_Locked() {
-  SpcPlayer_CopyVariablesToRam(g_zenv.player);
+  /*SpcPlayer_CopyVariablesToRam(g_zenv.player);
   // SpcPlayer.input_ports is not saved to the SpcPlayer ram by SpcPlayer_CopyVariablesToRam,
   // in any case, we want to save the most recently written data, and that might still
   // be in the queue. 0x410 is a free memory location in the SPC ram, so store it there.
@@ -513,11 +518,11 @@ void ZeldaSaveMusicStateToRam_Locked() {
   memcpy(&spc_player->ram[0x410], g_apu_write.ports, 4);
 
   msu_volume = g_msu_player.volume * 255;
-  memcpy(msu_resume_info, &g_msu_player.resume_info, sizeof(g_msu_player.resume_info));
+  memcpy(msu_resume_info, &g_msu_player.resume_info, sizeof(g_msu_player.resume_info));*/
 }
 
 void ZeldaEnableMsu(uint8 enable) {
-  g_msu_player.volume = 1.0f;
+  /*g_msu_player.volume = 1.0f;
   g_msu_player.enabled = enable;
   /*if (enable & kMsuEnabled_Opuz) {
     if (g_config.audio_freq != 48000)
@@ -526,17 +531,18 @@ void ZeldaEnableMsu(uint8 enable) {
     if (g_config.audio_freq != 44100)
       fprintf(stderr, "Warning: MSU requires: AudioFreq = 44100\n");
   }*/
+  /*
 
-  float volscale = /*g_config.msuvolume*/ 100 * (1.0f / 255 / 100);
-  float stepscale = /*g_config.msuvolume*/ 100 * (60.0f / 256 / 100) / /*g_config.audio_freq*/ 48000;
+  float volscale = /*g_config.msuvolume*/ /*100 * (1.0f / 255 / 100);
+  float stepscale = /*g_config.msuvolume*/ /*100 * (60.0f / 256 / 100) / /*g_config.audio_freq*/ /*48000;
   for (size_t i = 0; i != countof(kVolumeTransitionStepFloat); i++) {
     kVolumeTransitionStepFloat[i] = kVolumeTransitionStep[i] * stepscale;
     kVolumeTransitionTargetFloat[i] = kVolumeTransitionTarget[i] * volscale;
-  }
+  }*/
 }
 
 void LoadSongBank(const uint8 *p) {  // 808888
-  ZeldaApuLock();
+  /*ZeldaApuLock();
   SpcPlayer_Upload(g_zenv.player, p);
-  ZeldaApuUnlock();
+  ZeldaApuUnlock();*/
 }

@@ -121,7 +121,7 @@ struct Ppu {
   uint8_t brightnessMultHalf[32 * 2];
   uint16_t cgram[0x100];
   uint8_t mosaicModulo[kPpuXPixels];
-  uint32_t colorMapRgb[256];
+  // FIXME Only used for upsampling mode7 uint32_t colorMapRgb[256];
   PpuPixelPrioBufs bgBuffers[2];
   PpuPixelPrioBufs objBuffer;
   uint16_t vram[0x8000];

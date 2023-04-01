@@ -147,12 +147,12 @@ void PpuBeginDrawing(Ppu *ppu, uint8_t *pixels, size_t pitch, uint32_t render_fl
     memset(&ppu->brightnessMult[32], ppu->brightnessMult[31], 31);
   }
 
-  if (PpuGetCurrentRenderScale(ppu, ppu->renderFlags) == 4) {
+  /*if (PpuGetCurrentRenderScale(ppu, ppu->renderFlags) == 4) {
     for (int i = 0; i < 256; i++) {
       uint32 color = ppu->cgram[i];
       ppu->colorMapRgb[i] = ppu->brightnessMult[color & 0x1f] << 16 | ppu->brightnessMult[(color >> 5) & 0x1f] << 8 | ppu->brightnessMult[(color >> 10) & 0x1f];
     }
-  }
+  }*/
 }
 
 static inline void ClearBackdrop(PpuPixelPrioBufs *buf) {
@@ -713,6 +713,7 @@ static FORCEINLINE float FloatInterpolate(float x, float xmin, float xmax, float
 // Draws directly to the pixel buffer and bypasses any math, and supports only
 // a subset of the normal features (all that zelda needs)
 static void PpuDrawMode7Upsampled(Ppu *ppu, uint y) {
+/*
   // expand 13-bit values to signed values
   uint32 xCenter = ((int16_t)(ppu->m7matrix[4] << 3)) >> 3, yCenter = ((int16_t)(ppu->m7matrix[5] << 3)) >> 3;
   uint32 clippedH = (((int16_t)(ppu->m7matrix[6] << 3)) >> 3) - xCenter;
@@ -803,6 +804,7 @@ static void PpuDrawMode7Upsampled(Ppu *ppu, uint y) {
       memset(render_buffer_ptr + pitch * i + (256 + ppu->extraLeftRight * 2 - (ppu->extraLeftRight - ppu->extraRightCur)) * 4 * sizeof(uint32), 0, n);
   }
 #undef DRAW_PIXEL
+*/
 }
 
 static void PpuDrawBackgrounds(Ppu *ppu, int y, bool sub) {
