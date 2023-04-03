@@ -915,11 +915,9 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
       uint32 i = left + offset;
       do {
         uint16_t color = ppu->cgram[ppu->bgBuffers[0].data[i] & 0xff];
-        // FIXME DON'T CONVERT TO ARGB8888, KEEP IT RGB565
-        dst[0] = color;
-                 /*ppu->brightnessMult[color & clip_color_mask] << 16 |
-                 ppu->brightnessMult[(color >> 5) & clip_color_mask] << 8 |
-                 ppu->brightnessMult[(color >> 10) & clip_color_mask];*/
+        dst[0] = (ppu->brightnessMult[color & clip_color_mask] >> 3) << 11 |
+                 (ppu->brightnessMult[(color >> 5) & clip_color_mask] >> 2) << 5 |
+                 (ppu->brightnessMult[(color >> 10) & clip_color_mask] >> 3);
       } while (dst+=colStep, i+=colStep, i < right);
     } else {
       uint8 *half_color_map = ppu->halfColor ? ppu->brightnessMultHalf : ppu->brightnessMult;
@@ -956,10 +954,7 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
             b += b2;
           }
         }
-        // TODO RGB565 !!!
-        // TODO if b is 8bit --> need to convert not just truncate
-        //dst[0] = (b & 0x1f) | ((g & 0x1f) << 5) | ((r & 0x1f) << 11);//color_map[b] | color_map[g] << 8 | color_map[r] << 16;
-        dst[0] = (b >> 3) | ((g >> 2) << 5) | ((r >> 3) << 11);
+        dst[0] = (color_map[b] >> 3) | (color_map[g] >> 2) << 5 | (color_map[r] >> 3) << 11;
       } while (dst+=colStep, i+=colStep, i < right);
     }
   } while (cw_clip_math >>= 1, ++windex < cwin.nr);
