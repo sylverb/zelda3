@@ -243,7 +243,7 @@ static void ZeldaInitializationCode() {
   zelda_snes_dummy_write(HDMAEN, 0);
   zelda_snes_dummy_write(MDMAEN, 0);
 
-  // FIXME Sound_LoadIntroSongBank();
+  Sound_LoadIntroSongBank();
 
   Startup_InitializeMemory();
 
@@ -272,8 +272,8 @@ void ZeldaInitialize() {
   g_zenv.ram = g_ram;
   g_zenv.sram = g_sram; //(uint8*)calloc(8192, 1);
   g_zenv.vram = g_zenv.ppu->vram;
-  //g_zenv.player = SpcPlayer_Create();
-  //SpcPlayer_Initialize(g_zenv.player);
+  g_zenv.player = SpcPlayer_Create();
+  SpcPlayer_Initialize(g_zenv.player);
   dma_reset(g_zenv.dma);
   ppu_reset(g_zenv.ppu);
 }
