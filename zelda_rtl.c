@@ -857,24 +857,27 @@ void PatchCommand(char c) {
 }
 */
 
-void ZeldaReadSram(uint8* sram) {
+void ZeldaReadSram() {
   //FILE *f = fopen("saves/sram.dat", "rb");
   //if (f) {
     //if (fread(g_zenv.sram, 1, 8192, f) != 8192)
     //  fprintf(stderr, "Error reading saves/sram.dat\n");
     //fclose(f);
+    uint8_t* sram = readSramImpl();
     memcpy(g_zenv.sram, sram, 8192);
     EmuSynchronizeWholeState();
   //}
 }
 
 void ZeldaWriteSram() {
-  rename("saves/sram.dat", "saves/sram.bak");
-  FILE *f = fopen("saves/sram.dat", "wb");
-  if (f) {
-    fwrite(g_zenv.sram, 1, 8192, f);
-    fclose(f);
-  } else {
-    fprintf(stderr, "Unable to write saves/sram.dat\n");
-  }
+  writeSramImpl(g_zenv.sram);
+  // TODO Save to address in extflash
+  //rename("saves/sram.dat", "saves/sram.bak");
+  //FILE *f = fopen("saves/sram.dat", "wb");
+  //if (f) {
+  //  fwrite(g_zenv.sram, 1, 8192, f);
+  //  fclose(f);
+  //} else {
+  //  fprintf(stderr, "Unable to write saves/sram.dat\n");
+  //}
 }

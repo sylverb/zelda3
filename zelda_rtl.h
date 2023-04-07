@@ -63,7 +63,10 @@ enum {
 
 void SaveLoadSlot(int cmd, int which);
 void ZeldaWriteSram();
-void ZeldaReadSram(uint8_t* sram);
+void ZeldaReadSram();
+
+extern uint8_t* readSramImpl();
+extern void writeSramImpl(uint8_t* sram);
 
 typedef void ZeldaRunFrameFunc(uint16 input, int run_what);
 typedef void ZeldaSyncAllFunc();
