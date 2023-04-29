@@ -1095,11 +1095,17 @@ continue_after_set:
     }
   }
 
+  #if LIMIT_30FPS != 0
+  #define BLINK_EVERY_N_FRAMES 2
+  #else
+  #define BLINK_EVERY_N_FRAMES 1
+  #endif /* LIMIT_30FPS */
+
   uint16 t;
   bool hide_shadow = true;
   if (is_standing_in_doorway && ((t = link_x_coord - BG2HOFS_copy2) < 4 || t >= 252 || (t = link_y_coord - BG2VOFS_copy2) < 4 || t >= 224) ||
       (hide_shadow = false,
-      submodule_index == 0 && countdown_for_blink && --countdown_for_blink >= 4 && (countdown_for_blink & 1) == 0 ||
+      submodule_index == 0 && countdown_for_blink && --countdown_for_blink >= 4 && (countdown_for_blink & BLINK_EVERY_N_FRAMES) == 0 ||
       link_visibility_status == 12 ||
       link_cape_mode != 0)) {
     int shadow_oam_pos = (!hide_shadow && link_visibility_status != 12) ?
