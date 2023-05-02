@@ -482,12 +482,15 @@ void Module0E_0B_SaveMenu() {  // 80f9fa
   if (!submodule_index) {
     subsubmodule_index = 0;
     nmi_load_bg_from_vram = 1;
-    if (choice_in_multiselect_box) {
+    if (choice_in_multiselect_box == 1) {
       sound_effect_ambient = 15;
       main_module_index = 23;
       submodule_index = 1;
       index_of_changable_dungeon_objs[0] = 0;
       index_of_changable_dungeon_objs[1] = 0;
+    } else if (choice_in_multiselect_box == 2) {
+      SaveGameFile();
+      choice_in_multiselect_box = choice_in_multiselect_box_bak;
     } else {
       choice_in_multiselect_box = choice_in_multiselect_box_bak;
     }

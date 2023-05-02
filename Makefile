@@ -37,5 +37,5 @@ clean: clean_obj clean_gen
 clean_obj:
 	@$(RM) $(OBJS) $(TARGET_EXEC)
 clean_gen:
-	@$(RM) $(RES) tables/zelda3_assets.dat tables/*.txt tables/*.png tables/sprites/*.png tables/*.yaml
+	@$(RM) $(RES) tables/zelda3_assets.dat tables/*.txt tables/*.png tables/sprites/*.png tables/*.yaml tables/*.patched
 	@rm -rf tables/__pycache__ tables/dungeon tables/img tables/overworld tables/sound
