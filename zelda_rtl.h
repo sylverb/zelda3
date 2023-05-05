@@ -61,12 +61,16 @@ enum {
   kSaveLoad_Replay = 2,
 };
 
-void SaveLoadSlot(int cmd, int which);
+void SaveLoadSlot(int cmd, uint8* slot);
 void ZeldaWriteSram();
 void ZeldaReadSram();
 
 extern uint8_t* readSramImpl();
 extern void writeSramImpl(uint8_t* sram);
+
+extern void writeSaveStateInitImpl();
+extern void writeSaveStateImpl(uint8_t* data, size_t size);
+extern void writeSaveStateFinalizeImpl();
 
 typedef void ZeldaRunFrameFunc(uint16 input, int run_what);
 typedef void ZeldaSyncAllFunc();

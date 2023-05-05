@@ -468,7 +468,7 @@ bool ZeldaIsMusicPlaying() {
 
 void ZeldaRestoreMusicAfterLoad_Locked(bool is_reset) {
   // Restore spc variables from the ram dump.
-  /*SpcPlayer_CopyVariablesFromRam(g_zenv.player);
+  SpcPlayer_CopyVariablesFromRam(g_zenv.player);
   // This is not stored in the snapshot
   g_zenv.player->timer_cycles = 0;
 
@@ -481,7 +481,7 @@ void ZeldaRestoreMusicAfterLoad_Locked(bool is_reset) {
     SpcPlayer_Initialize(g_zenv.player);
   }
 
-  MsuPlayer *mp = &g_msu_player;
+  /*MsuPlayer *mp = &g_msu_player;
   if (mp->enabled) {
     mp->volume = 0.0;
     MsuPlayer_Open(mp, (music_unk1 == 0xf1) ? ((MsuPlayerResumeInfo*)msu_resume_info)->orig_track : 
@@ -506,14 +506,14 @@ void ZeldaRestoreMusicAfterLoad_Locked(bool is_reset) {
 }
 
 void ZeldaSaveMusicStateToRam_Locked() {
-  /*SpcPlayer_CopyVariablesToRam(g_zenv.player);
+  SpcPlayer_CopyVariablesToRam(g_zenv.player);
   // SpcPlayer.input_ports is not saved to the SpcPlayer ram by SpcPlayer_CopyVariablesToRam,
   // in any case, we want to save the most recently written data, and that might still
   // be in the queue. 0x410 is a free memory location in the SPC ram, so store it there.
   SpcPlayer *spc_player = g_zenv.player;
   memcpy(&spc_player->ram[0x410], g_apu_write.ports, 4);
 
-  msu_volume = g_msu_player.volume * 255;
+  /*msu_volume = g_msu_player.volume * 255;
   memcpy(msu_resume_info, &g_msu_player.resume_info, sizeof(g_msu_player.resume_info));*/
 }
 

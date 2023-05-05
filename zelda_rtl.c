@@ -349,12 +349,14 @@ void ByteArray_AppendVl(ByteArray *arr, uint32 v) {
   for (; v >= 255; v -= 255)
     ByteArray_AppendByte(arr, 255);
   ByteArray_AppendByte(arr, v);
-}
+}*/
 
 void saveFunc(void *ctx_in, void *data, size_t data_size) {
-  ByteArray_AppendData((ByteArray *)ctx_in, data, data_size);
+  // TODO Program extflash !!! --> extern function ?
+  //ByteArray_AppendData((ByteArray *)ctx_in, data, data_size);
+  writeSaveStateImpl(data, data_size);
 }
-*/
+
 
 typedef struct LoadFuncState {
   uint8 *p, *pend;
@@ -380,6 +382,11 @@ static void InternalSaveLoad(SaveLoadFunc *func, void *ctx) {
   func(ctx, junk, 58); // snes junk
   func(ctx, g_zenv.ram, 0x20000);  // 0x20000 bytes of ram
   func(ctx, junk, 4); // snes junk
+}
+
+static size_t InternalSaveLoadSize() {
+  // 275465 bytes
+  return 27 + 0x10000 + 40 + 3024 + 15 + 192 + 66619 + 512 + 174 + 8192 + 58 + 0x20000 + 4;
 }
 
 void ZeldaReset(bool preserve_sram) {
@@ -692,6 +699,21 @@ int InputStateReadFromFile() {
 #endif
 */
 
+
+void StateRecorder_Load(uint8* slot_addr) {
+  size_t size = *((size_t*) slot_addr);
+  LoadFuncState state = { slot_addr + sizeof(size_t), slot_addr + sizeof(size_t) + size };
+  LoadSnesState(&loadFunc, &state);
+}
+
+void StateRecorder_Save(uint8* slot_addr) {
+  size_t savestateSize = InternalSaveLoadSize();
+  writeSaveStateInitImpl();
+  writeSaveStateImpl(&savestateSize, sizeof(size_t));
+  SaveSnesState(&saveFunc, slot_addr);
+  writeSaveStateFinalizeImpl();
+}
+
 bool ZeldaRunFrame(int inputs) {
 
   // Avoid up/down and left/right from being pressed at the same time
@@ -778,8 +800,8 @@ static const char *const kReferenceSaves[] = {
   "Chapter 13 - After Ganon's Tower.sav",
 };
 
-void SaveLoadSlot(int cmd, int which) {
-  char name[128];
+void SaveLoadSlot(int cmd, uint8* slot) {
+  /*char name[128];
   if (which & 256) {
     if (cmd == kSaveLoad_Save)
       return;
@@ -787,19 +809,19 @@ void SaveLoadSlot(int cmd, int which) {
   } else {
     sprintf(name, "saves/save%d.sav", which);
   }
-  FILE *f = fopen(name, cmd != kSaveLoad_Save ? "rb" : "wb");
-  if (f) {
+  FILE *f = fopen(name, cmd != kSaveLoad_Save ? "rb" : "wb");*/
+  /*if (f) {
     printf("*** %s slot %d\n",
-      cmd == kSaveLoad_Save ? "Saving" : cmd == kSaveLoad_Load ? "Loading" : "Replaying", which);
+      cmd == kSaveLoad_Save ? "Saving" : cmd == kSaveLoad_Load ? "Loading" : "Replaying", which);*/
 
-    /*
+    
     if (cmd != kSaveLoad_Save)
-      StateRecorder_Load(&state_recorder, f, cmd == kSaveLoad_Replay);
+      StateRecorder_Load(/*&state_recorder, */slot);
     else
-      StateRecorder_Save(&state_recorder, f);*/
-
+      StateRecorder_Save(/*&state_recorder, */slot);
+  /*
     fclose(f);
-  }
+  }*/
 }
 
 /*
