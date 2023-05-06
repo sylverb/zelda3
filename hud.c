@@ -1253,11 +1253,19 @@ void Hud_DrawSelectedYButtonItem() {  // 8deb3a
   if(g_battery.is_charging){
     base = 0x3400;
   }
+
   Hud_IntToDecimal(g_battery.level, d); // TODO: use global battery value
+                                        //
   if(d[1] > 0x90)
     dst_box[HUDXY(27, 4)] = base | d[1];
+  else
+    dst_box[HUDXY(27, 4)] = 0x207f; // Erase
+
   if(d[2] > 0x90 || d[1] > 0x90)
     dst_box[HUDXY(28, 4)] = base | d[2];
+  else
+    dst_box[HUDXY(28, 4)] = 0x207f; // Erase
+
   dst_box[HUDXY(29, 4)] = base | d[3];
 #endif
 }
