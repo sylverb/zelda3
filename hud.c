@@ -4,19 +4,13 @@
 #include "variables.h"
 #include "messaging.h"
 
-<<<<<<< Updated upstream
-=======
 #define MENU_ANIM_STEP 16  // Default: 8; absolute max value 232
 
-#ifndef BATTERY_INDICATOR
-#define BATTERY_INDICATOR 0
-#endif
 
 #if BATTERY_INDICATOR
-uint8_t g_battery_level = 0;
+battery_t g_battery = {.level=0, .is_charging=false};
 #endif
 
->>>>>>> Stashed changes
 enum {
   kNewStyleInventory = 0,
   kHudItemCount = kNewStyleInventory ? 24 : 20,
@@ -1254,13 +1248,17 @@ void Hud_DrawSelectedYButtonItem() {  // 8deb3a
   Hud_DrawNxN(dst_box + HUDXY(22, 8), src_p, 8, 2);
 
 #if BATTERY_INDICATOR
+  uint16_t base = 0x2400;
   uint8_t d[4];
-  Hud_IntToDecimal(g_battery_level, d); // TODO: use global battery value
+  if(g_battery.is_charging){
+    base = 0x3400;
+  }
+  Hud_IntToDecimal(g_battery.level, d); // TODO: use global battery value
   if(d[1] > 0x90)
-    dst_box[HUDXY(27, 5)] = 0x2400 | d[1];
+    dst_box[HUDXY(27, 5)] = base | d[1];
   if(d[2] > 0x90 || d[1] > 0x90)
-    dst_box[HUDXY(28, 5)] = 0x2400 | d[2];
-  dst_box[HUDXY(29, 5)] = 0x2400 | d[3];
+    dst_box[HUDXY(28, 5)] = base | d[2];
+  dst_box[HUDXY(29, 5)] = base | d[3];
 #endif
 }
 
