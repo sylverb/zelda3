@@ -4,6 +4,19 @@
 #include "variables.h"
 #include "messaging.h"
 
+<<<<<<< Updated upstream
+=======
+#define MENU_ANIM_STEP 16  // Default: 8; absolute max value 232
+
+#ifndef BATTERY_INDICATOR
+#define BATTERY_INDICATOR 0
+#endif
+
+#if BATTERY_INDICATOR
+uint8_t g_battery_level = 0;
+#endif
+
+>>>>>>> Stashed changes
 enum {
   kNewStyleInventory = 0,
   kHudItemCount = kNewStyleInventory ? 24 : 20,
@@ -18,6 +31,7 @@ static bool Hud_DoWeHaveThisItem(uint8 item);
 static void Hud_EquipPrevItem(uint8 *item);
 static void Hud_EquipNextItem(uint8 *item);
 static int Hud_GetItemPosition(int item);
+static void Hud_IntToDecimal(unsigned int number, uint8 *out);
 static void Hud_ReorderItem(int direction);
 static void Hud_Update_Magic();
 static void Hud_Update_Inventory();
@@ -1003,6 +1017,7 @@ void Hud_DrawYButtonItems() {  // 8de3d9
     dst[HUDXY(2, 6)] = kEquipmentLetterTiles[btn_index][0];
     dst[HUDXY(2, 7)] = kEquipmentLetterTiles[btn_index][1]; 
   }
+  // ITEM text
   dst[HUDXY(x + 2, 5)] = 0x246E;
   dst[HUDXY(x + 3, 5)] = 0x246F;
 
@@ -1237,6 +1252,16 @@ void Hud_DrawSelectedYButtonItem() {  // 8deb3a
     src_p = &kHudItemText[(item - 1) * 16];
   }
   Hud_DrawNxN(dst_box + HUDXY(22, 8), src_p, 8, 2);
+
+#if BATTERY_INDICATOR
+  uint8_t d[4];
+  Hud_IntToDecimal(g_battery_level, d); // TODO: use global battery value
+  if(d[1] > 0x90)
+    dst_box[HUDXY(27, 5)] = 0x2400 | d[1];
+  if(d[2] > 0x90 || d[1] > 0x90)
+    dst_box[HUDXY(28, 5)] = 0x2400 | d[2];
+  dst_box[HUDXY(29, 5)] = 0x2400 | d[3];
+#endif
 }
 
 void Hud_DrawEquipmentBox() {  // 8ded29
