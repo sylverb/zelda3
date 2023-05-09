@@ -2502,7 +2502,11 @@ restart:
     dialogue_msg_dst_offs += 2;
     break;
   case 20:  // RenderText_Draw_SetSpeed
+    #if FASTER_UI != 0
+    vwf_line_speed = vwf_line_mode = 0;
+    #else
     vwf_line_speed = vwf_line_mode = messaging_text_buffer[dialogue_msg_dst_offs + 1];
+    #endif
     dialogue_msg_dst_offs += 2;
     break;
   case 21:  // RenderText_Draw_Command7B

@@ -186,17 +186,13 @@ void ppu_runLine(Ppu *ppu, int line) {
     } else {
       if (ppu->mode == 7)
         ppu_calculateMode7Starts(ppu, line);
-      // Increase framerate by skipping columns
-      uint8_t rowStep = ((ppu->renderFlags & 0xc0000000) >> 30) + 1;
-      uint8_t colStep = ((ppu->renderFlags & 0x30000000) >> 28) + 1;
-      uint8_t offset = colStep - 1 - ((((ppu->renderFlags & 0x0f000000) >> 24) / rowStep) % colStep);
-      for (int x = offset; x < 256; x+=colStep)
+      for (int x = 0; x < 256; x++)
         ppu_handlePixel(ppu, x, line);
 
       uint8 *dst = ppu->renderBuffer + ((line - 1) * ppu->renderPitch);
       if (ppu->extraLeftRight != 0) {
         memset(dst, 0, sizeof(uint16_t) * ppu->extraLeftRight);
-        memset(dst + sizeof(uint16_t) * (256 + ppu->extraLeftRight), 0, sizeof(uint32) * ppu->extraLeftRight);
+        memset(dst + sizeof(uint16_t) * (256 + ppu->extraLeftRight), 0, sizeof(uint16_t) * ppu->extraLeftRight);
       }
     }
   }
@@ -852,7 +848,7 @@ static void PpuDrawBackgrounds(Ppu *ppu, int y, bool sub) {
 static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
   if (ppu->forcedBlank) {
     uint8 *dst = &ppu->renderBuffer[(y - 1) * ppu->renderPitch];
-    size_t n = sizeof(uint32) * (256 + ppu->extraLeftRight * 2);
+    size_t n = sizeof(uint16_t) * (256 + ppu->extraLeftRight * 2);
     memset(dst, 0, n);
     return;
   }
@@ -891,16 +887,10 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
   uint32 cw_clip_math = ((cwin.bits & kCwBitsMod[ppu->clipMode]) ^ kCwBitsMod[ppu->clipMode + 4]) |
                         ((cwin.bits & kCwBitsMod[ppu->preventMathMode]) ^ kCwBitsMod[ppu->preventMathMode + 4]) << 8;
 
-  uint8_t rowStep = ((ppu->renderFlags & 0xc0000000) >> 30) + 1;
-  uint8_t colStep = ((ppu->renderFlags & 0x30000000) >> 28) + 1;
-  uint8_t offset = colStep - 1 - ((((ppu->renderFlags & 0x0f000000) >> 24) / rowStep) % colStep);
-  
   // TODO uint16_t for RGB565 ???
   uint16_t *dst = (uint16_t*)&ppu->renderBuffer[(y - 1) * ppu->renderPitch], *dst_org = dst;
   
   dst += (ppu->extraLeftRight - ppu->extraLeftCur);
-
-  dst += offset;
 
   uint32 windex = 0;
   do {
@@ -912,20 +902,20 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
     if (math_enabled_cur == 0 || fixed_color == 0 && !ppu->halfColor && !rendered_subscreen) {
       // Math is disabled (or has no effect), so can avoid the per-pixel maths check
       // Increase framerate by skipping columns
-      uint32 i = left + offset;
+      uint32 i = left;
       do {
         uint16_t color = ppu->cgram[ppu->bgBuffers[0].data[i] & 0xff];
         dst[0] = (ppu->brightnessMult[color & clip_color_mask] >> 3) << 11 |
                  (ppu->brightnessMult[(color >> 5) & clip_color_mask] >> 2) << 5 |
                  (ppu->brightnessMult[(color >> 10) & clip_color_mask] >> 3);
-      } while (dst+=colStep, i+=colStep, i < right);
+      } while (dst++, ++i < right);
     } else {
       uint8 *half_color_map = ppu->halfColor ? ppu->brightnessMultHalf : ppu->brightnessMult;
       // Store this in locals
       math_enabled_cur |= ppu->addSubscreen << 8 | ppu->subtractColor << 9;
       // Need to check for each pixel whether to use math or not based on the main screen layer.
       // Increase framerate by skipping columns
-      uint32 i = left + offset;
+      uint32 i = left;
       do {
         // TODO uint16_t for RGB565 ???
         uint16_t color = ppu->cgram[ppu->bgBuffers[0].data[i] & 0xff], color2;
@@ -955,7 +945,7 @@ static NOINLINE void PpuDrawWholeLine(Ppu *ppu, uint y) {
           }
         }
         dst[0] = (color_map[b] >> 3) | (color_map[g] >> 2) << 5 | (color_map[r] >> 3) << 11;
-      } while (dst+=colStep, i+=colStep, i < right);
+      } while (dst++, ++i < right);
     }
   } while (cw_clip_math >>= 1, ++windex < cwin.nr);
 
