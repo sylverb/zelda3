@@ -4,7 +4,11 @@
 #include "variables.h"
 #include "messaging.h"
 
-#define MENU_ANIM_STEP 16  // Default: 8; absolute max value 232
+#if FASTER_UI != 0
+#define MENU_ANIM_STEP 16
+#else
+#define MENU_ANIM_STEP 8  // Default: 8; absolute max value 232
+#endif /* FASTER_UI */
 
 enum {
   kNewStyleInventory = 0,
