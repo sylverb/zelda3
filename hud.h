@@ -1,6 +1,19 @@
 #pragma once
 #include "types.h"
 
+#ifndef BATTERY_INDICATOR
+#define BATTERY_INDICATOR 0
+#endif
+
+#if BATTERY_INDICATOR
+typedef struct {
+  uint8_t level;
+  bool is_charging;
+} battery_t;
+
+extern battery_t g_battery;
+#endif
+
 enum kHudItems {
 
   kHudItem_Bombs = 4,
