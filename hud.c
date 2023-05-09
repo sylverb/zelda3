@@ -4,6 +4,8 @@
 #include "variables.h"
 #include "messaging.h"
 
+#define MENU_ANIM_STEP 16  // Default: 8; absolute max value 232
+
 enum {
   kNewStyleInventory = 0,
   kHudItemCount = kNewStyleInventory ? 24 : 20,
@@ -531,9 +533,13 @@ void Hud_Init() {  // 8dddab
 }
 
 void Hud_BringMenuDown() {  // 8dde59
-  BG3VOFS_copy2 -= 8;
-  if (BG3VOFS_copy2 == 0xff18)
+  if (BG3VOFS_copy2 >= 0xff18 && BG3VOFS_copy2 < (0xff18 + MENU_ANIM_STEP)){
+    BG1VOFS_copy2 = 0xff18;
     overworld_map_state++;
+  }
+  else{
+    BG3VOFS_copy2 -= MENU_ANIM_STEP;
+  }
 }
 
 void Hud_ChooseNextMode() {  // 8dde6e
@@ -702,7 +708,12 @@ void Hud_UpdateEquippedItem() {  // 8ddfaf
 }
 
 void Hud_CloseMenu() {  // 8ddfba
-  BG3VOFS_copy2 += 8;
+  if(BG3VOFS_copy2 > (0xFFFF - MENU_ANIM_STEP)){
+    BG3VOFS_copy2 = 0;
+  }
+  else{
+    BG3VOFS_copy2 += MENU_ANIM_STEP;
+  }
   if (BG3VOFS_copy2)
     return;
   Hud_Rebuild();
