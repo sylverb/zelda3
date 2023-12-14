@@ -699,6 +699,13 @@ int InputStateReadFromFile() {
 
 void StateRecorder_Load(uint8* slot_addr) {
   size_t size = *((size_t*) slot_addr);
+  // Sanity-check savestate
+  size_t expectedSavestateSize = InternalSaveLoadSize();
+  size_t actualSavestateSize = *((size_t*)slot_addr);
+  if (expectedSavestateSize != actualSavestateSize) {
+		printf("StateRecorder_Load: Invalid state save size, expected=0x%08x actual=0x%08x\n", expectedSavestateSize, actualSavestateSize);
+		return;
+  }
   LoadFuncState state = { slot_addr + sizeof(size_t), slot_addr + sizeof(size_t) + size };
   LoadSnesState(&loadFunc, &state);
 }
