@@ -362,7 +362,7 @@ typedef struct LoadFuncState {
 void loadFunc(void *ctx, void *data, size_t data_size) {
   LoadFuncState *st = (LoadFuncState *)ctx;
   assert(st->pend - st->p >= data_size);
-  memcpy(data, st->p, data_size);
+  readSaveStateImpl(data, data_size);
   st->p += data_size;
 }
 
@@ -698,16 +698,18 @@ int InputStateReadFromFile() {
 
 
 void StateRecorder_Load(uint8* slot_addr) {
-  size_t size = *((size_t*) slot_addr);
+  size_t size;
+  readSaveStateInitImpl();
+  readSaveStateImpl(&size, sizeof(size_t));
   // Sanity-check savestate
   size_t expectedSavestateSize = InternalSaveLoadSize();
-  size_t actualSavestateSize = *((size_t*)slot_addr);
-  if (expectedSavestateSize != actualSavestateSize) {
-		printf("StateRecorder_Load: Invalid state save size, expected=0x%08x actual=0x%08x\n", expectedSavestateSize, actualSavestateSize);
+  if (expectedSavestateSize != size) {
+		printf("StateRecorder_Load: Invalid state save size, expected=0x%08x actual=0x%08x\n", expectedSavestateSize, size);
 		return;
   }
   LoadFuncState state = { slot_addr + sizeof(size_t), slot_addr + sizeof(size_t) + size };
   LoadSnesState(&loadFunc, &state);
+  readSaveStateFinalizeImpl();
 }
 
 void StateRecorder_Save(uint8* slot_addr) {
@@ -910,8 +912,7 @@ void ZeldaReadSram() {
     //if (fread(g_zenv.sram, 1, 8192, f) != 8192)
     //  fprintf(stderr, "Error reading saves/sram.dat\n");
     //fclose(f);
-    uint8_t* sram = readSramImpl();
-    memcpy(g_zenv.sram, sram, 8192);
+    readSramImpl(g_zenv.sram);
     EmuSynchronizeWholeState();
   //}
 }
