@@ -69,6 +69,9 @@ void SaveLoadSlot(int cmd, uint8* slot);
 void ZeldaWriteSram();
 void ZeldaReadSram();
 
+extern uint8_t *ZeldaGetSram();
+extern void ZeldaApplySram();
+
 extern void readSramImpl(uint8_t* sram);
 extern void writeSramImpl(uint8_t* sram);
 
