@@ -7,6 +7,7 @@
 #include <assert.h>
 #include "ppu.h"
 #include "../types.h"
+#include "gw_malloc.h"
 
 static const uint8 kSpriteSizes[8][2] = {
   {8, 16}, {8, 32}, {8, 64}, {16, 32},
@@ -37,7 +38,8 @@ static Ppu g_ppu;
 
 Ppu* ppu_init() {
   // Static allocation
-  Ppu* ppu = &g_ppu;  //(Ppu * )malloc(sizeof(Ppu));
+  Ppu* ppu = &g_ppu; //(Ppu * )calloc(1,sizeof(Ppu));
+  ppu->vram = (uint16_t *)itc_calloc(1, 0x10000); // 64KB of VRAM in ITC RAM
   ppu->extraLeftRight = kPpuExtraLeftRight;
   return ppu;
 }
@@ -47,7 +49,7 @@ void ppu_free(Ppu* ppu) {
 }
 
 void ppu_reset(Ppu* ppu) {
-  memset(ppu->vram, 0, sizeof(ppu->vram));
+  memset(ppu->vram, 0, 0x10000);
   ppu->lastBrightnessMult = 0xff;
   ppu->lastMosaicModulo = 0xff;
   ppu->extraLeftCur = 0;
@@ -112,7 +114,7 @@ void ppu_reset(Ppu* ppu) {
 void ppu_saveload(Ppu *ppu, SaveLoadFunc *func, void *ctx) {
   uint8 tmp[556] = { 0 };
 
-  func(ctx, &ppu->vram, 0x8000 * 2);
+  func(ctx, ppu->vram, 0x8000 * 2);
   func(ctx, tmp, 10);
   func(ctx, &ppu->cgram, 512);
   func(ctx, tmp, 556);

@@ -124,7 +124,7 @@ struct Ppu {
   // FIXME Only used for upsampling mode7 uint32_t colorMapRgb[256];
   PpuPixelPrioBufs bgBuffers[2];
   PpuPixelPrioBufs objBuffer;
-  uint16_t vram[0x8000];
+  uint16_t *vram;
 };
 
 Ppu* ppu_init();
