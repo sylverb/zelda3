@@ -1964,7 +1964,7 @@ void Credits_SpriteDraw_PreexistingSpriteDraw(int k, uint8 a) {  // 8ea6b3
 }
 
 void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
-  static const DrawMultipleData kEndSequence_Dmd0[12] = {
+  static const DrawMultipleData kEndSequence_Dmd0[12] __attribute__((section (".noreloc"))) = {
     { 0, -8, 0x072a, 2},
     { 0, -8, 0x072a, 2},
     { 0,  0, 0x4fca, 2},
@@ -1978,7 +1978,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     { 0, -8, 0x072a, 2},
     { 0,  0, 0x4fca, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd1[6] = {
+  static const DrawMultipleData kEndSequence_Dmd1[6] __attribute__((section (".noreloc"))) = {
     {14,  -7, 0x0d48, 2},
     { 0,  -6, 0x0944, 2},
     { 0,   0, 0x094e, 2},
@@ -1986,7 +1986,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     { 0,  -8, 0x0944, 2},
     { 0,   0, 0x0946, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd2[16] = {
+  static const DrawMultipleData kEndSequence_Dmd2[16] __attribute__((section (".noreloc"))) = {
     {-2, -16, 0x3d78, 0},
     { 0, -24, 0x3d24, 2},
     { 0, -16, 0x3dc2, 2},
@@ -2004,7 +2004,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     { 0,  -6, 0x326c, 2},
     {64,  -6, 0x326c, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd3[12] = {
+  static const DrawMultipleData kEndSequence_Dmd3[12] __attribute__((section (".noreloc"))) = {
     { 0,  0, 0x0022, 2},
     {48,  0, 0x0064, 2},
     { 0, 10, 0x016c, 2},
@@ -2018,7 +2018,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     { 0, 10, 0x016c, 2},
     {48, 10, 0x016c, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd4[8] = {
+  static const DrawMultipleData kEndSequence_Dmd4[8] __attribute__((section (".noreloc"))) = {
     {10,   8, 0x8a32, 0},
     {10,  16, 0x8a22, 0},
     { 0, -10, 0x0800, 2},
@@ -2028,7 +2028,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     {0, -10, 0x082a, 2},
     {0,   0, 0x0828, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd5[10] = {
+  static const DrawMultipleData kEndSequence_Dmd5[10] __attribute__((section (".noreloc"))) = {
     {10,  16, 0x8a05, 0},
     {10,   8, 0x8a15, 0},
     {-4,   2, 0x0a07, 2},
@@ -2040,12 +2040,12 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     { 0,  -7, 0x0e00, 2},
     { 0,   1, 0x0e02, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd6[3] = {
+  static const DrawMultipleData kEndSequence_Dmd6[3] __attribute__((section (".noreloc"))) = {
     {-6, -2, 0x0706, 2},
     { 0, -9, 0x090e, 2},
     { 0, -1, 0x0908, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd7[10] = {
+  static const DrawMultipleData kEndSequence_Dmd7[10] __attribute__((section (".noreloc"))) = {
     {0, -10, 0x082a, 2},
     {0,   0, 0x0828, 2},
     {10,  16, 0x8a05, 0},
@@ -2057,22 +2057,22 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     {10, -12, 0x0a15, 0},
     {-7,   1, 0x4a07, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd8[1] = {
+  static const DrawMultipleData kEndSequence_Dmd8[1] __attribute__((section (".noreloc"))) = {
     {0, -19, 0x39af, 0},
   };
-  static const DrawMultipleData kEndSequence_Dmd9[4] = {
+  static const DrawMultipleData kEndSequence_Dmd9[4] __attribute__((section (".noreloc"))) = {
     {-16, -24, 0x3704, 2},
     {-16, -16, 0x3764, 2},
     {-16, -24, 0x3762, 2},
     {-16, -16, 0x3764, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd10[4] = {
+  static const DrawMultipleData kEndSequence_Dmd10[4] __attribute__((section (".noreloc"))) = {
     {0, 0, 0x0c0c, 2},
     {0, 0, 0x0c0a, 2},
     {0, 0, 0x0cc5, 2},
     {0, 0, 0x0ce1, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd11[6] = {
+  static const DrawMultipleData kEndSequence_Dmd11[6] __attribute__((section (".noreloc"))) = {
     {1,  4, 0x002a, 0},
     {1, 12, 0x003a, 0},
     {4,  0, 0x0026, 2},
@@ -2080,7 +2080,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     {8,  9, 0x4024, 2},
     {4, 20, 0x016c, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd12[21] = {
+  static const DrawMultipleData kEndSequence_Dmd12[21] __attribute__((section (".noreloc"))) = {
     { 0, -7, 0x0d00, 2},
     { 0, -7, 0x0d00, 2},
     { 0,  0, 0x0d06, 2},
@@ -2103,7 +2103,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     { 0, -8, 0x0d02, 2},
     { 0,  0, 0x0d2c, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd13[16] = {
+  static const DrawMultipleData kEndSequence_Dmd13[16] __attribute__((section (".noreloc"))) = {
     {0, -7, 0x0e00, 2},
     {0,  1, 0x4e02, 2},
     {0, -8, 0x0e00, 2},
@@ -2121,7 +2121,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     {0, -7, 0x0e00, 2},
     {0,  1, 0x4e02, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd14[6] = {
+  static const DrawMultipleData kEndSequence_Dmd14[6] __attribute__((section (".noreloc"))) = {
     {0, 0, 0, 0},
     {0, 0, 0x34c7, 0},
     {0, 0, 0x3480, 0},
@@ -2129,7 +2129,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     {0, 0, 0x34b7, 0},
     {0, 0, 0x34a6, 0},
   };
-  static const DrawMultipleData kEndSequence_Dmd15[6] = {
+  static const DrawMultipleData kEndSequence_Dmd15[6] __attribute__((section (".noreloc"))) = {
     {-3, 17, 0x002b, 0},
     {-3, 25, 0x003b, 0},
     { 0,  0, 0x000e, 2},
@@ -2137,20 +2137,20 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     { 0, 16, 0x002e, 2},
     {16, 16, 0x402e, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd16[3] = {
+  static const DrawMultipleData kEndSequence_Dmd16[3] __attribute__((section (".noreloc"))) = {
     { 8,  5, 0x0a04, 2},
     { 0, 16, 0x0806, 2},
     {16, 16, 0x4806, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd17[2] = {
+  static const DrawMultipleData kEndSequence_Dmd17[2] __attribute__((section (".noreloc"))) = {
     {0,  0, 0x0000, 2},
     {0, 11, 0x0002, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd18[2] = {
+  static const DrawMultipleData kEndSequence_Dmd18[2] __attribute__((section (".noreloc"))) = {
     {0,  0, 0x000e, 2},
     {0, 64, 0x006c, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd19[8] = {
+  static const DrawMultipleData kEndSequence_Dmd19[8] __attribute__((section (".noreloc"))) = {
     {0, 0, 0x0882, 2},
     {0, 7, 0x0a4e, 2},
     {0, 0, 0x4880, 2},
@@ -2160,7 +2160,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     {0, 0, 0x0880, 2},
     {0, 7, 0x0a4e, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd20[6] = {
+  static const DrawMultipleData kEndSequence_Dmd20[6] __attribute__((section (".noreloc"))) = {
     {-4,  1, 0x0c68, 0},
     { 0, -8, 0x0c40, 2},
     { 0,  1, 0x0c42, 2},
@@ -2168,7 +2168,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     { 0, -8, 0x0c40, 2},
     { 0,  1, 0x0c42, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd21[6] = {
+  static const DrawMultipleData kEndSequence_Dmd21[6] __attribute__((section (".noreloc"))) = {
     {8,   5, 0x0679, 0},
     {0, -10, 0x088e, 2},
     {0,   0, 0x066e, 2},
@@ -2176,7 +2176,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     {0, -10, 0x088e, 2},
     {0,   0, 0x066e, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd22[6] = {
+  static const DrawMultipleData kEndSequence_Dmd22[6] __attribute__((section (".noreloc"))) = {
     {11,  -3, 0x0869, 0},
     { 0, -12, 0x0804, 2},
     { 0,   0, 0x0860, 2},
@@ -2184,7 +2184,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     { 0, -12, 0x0804, 2},
     { 0,   0, 0x0860, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd23[6] = {
+  static const DrawMultipleData kEndSequence_Dmd23[6] __attribute__((section (".noreloc"))) = {
     {-2,  1, 0x0868, 0},
     { 0, -8, 0x08c0, 2},
     { 0,  0, 0x08c2, 2},
@@ -2192,19 +2192,19 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     { 0, -8, 0x08c0, 2},
     { 0,  0, 0x08c2, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd24[4] = {
+  static const DrawMultipleData kEndSequence_Dmd24[4] __attribute__((section (".noreloc"))) = {
     {0, -10, 0x084c, 2},
     {0,   0, 0x0a6c, 2},
     {0,  -9, 0x084c, 2},
     {0,   0, 0x0aa8, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd25[4] = {
+  static const DrawMultipleData kEndSequence_Dmd25[4] __attribute__((section (".noreloc"))) = {
     {0, -7, 0x084a, 2},
     {0,  0, 0x0c6a, 2},
     {0, -7, 0x084a, 2},
     {0,  0, 0x0ca6, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd26[12] = {
+  static const DrawMultipleData kEndSequence_Dmd26[12] __attribute__((section (".noreloc"))) = {
     {-18, -24, 0x39a4, 2},
     {-16, -16, 0x39a8, 2},
     {-18, -24, 0x39a4, 2},
@@ -2218,7 +2218,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     {-16, -24, 0x39a0, 2},
     {-16, -16, 0x39aa, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd27[6] = {
+  static const DrawMultipleData kEndSequence_Dmd27[6] __attribute__((section (".noreloc"))) = {
     { 0,  -4, 0x30aa, 2},
     { 0,  -4, 0x30aa, 2},
     {-4,  -8, 0x3090, 0},
@@ -2226,7 +2226,7 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     {-6, -10, 0x3091, 0},
     {14, -10, 0x7091, 0},
   };
-  static const DrawMultipleData kEndSequence_Dmd28[8] = {
+  static const DrawMultipleData kEndSequence_Dmd28[8] __attribute__((section (".noreloc"))) = {
     {0,  0, 0x0722, 2},
     {0, -8, 0x09c2, 2},
     {0,  0, 0x4722, 2},
@@ -2236,15 +2236,15 @@ void Credits_SpriteDraw_Single(int k, uint8 a, uint8 j) {  // 8ea703
     {0, -9, 0x0924, 2},
     {0,  0, 0x0722, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd29[3] = {
+  static const DrawMultipleData kEndSequence_Dmd29[3] __attribute__((section (".noreloc"))) = {
     {-16, -12, 0x3f08, 2},
     {  0, -12, 0x3f20, 2},
     { 16, -12, 0x3f20, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd30[1] = {
+  static const DrawMultipleData kEndSequence_Dmd30[1] __attribute__((section (".noreloc"))) = {
     {0, 0, 0x0086, 2},
   };
-  static const DrawMultipleData kEndSequence_Dmd31[1] = {
+  static const DrawMultipleData kEndSequence_Dmd31[1] __attribute__((section (".noreloc"))) = {
     {0, 0, 0x8060, 2},
   };
   static const DrawMultipleData *const kEndSequence_Dmds[] = {

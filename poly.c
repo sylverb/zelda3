@@ -27,7 +27,7 @@ static const int8 kPolySinCos[320] = {
 typedef struct Vertex3 {
   int8 x, y, z;
 } Vertex3;
-static const Vertex3 kPoly0_Vtx[6] = {
+static const Vertex3 kPoly0_Vtx[6] __attribute__((section (".noreloc"))) = {
   {  0,  65,   0},
   {  0, -65,   0},
   {  0,   0, -40},
@@ -35,7 +35,7 @@ static const Vertex3 kPoly0_Vtx[6] = {
   {  0,   0,  40},
   { 40,   0,   0},
 };
-static const uint8 kPoly0_Polys[40] = {
+static const uint8 kPoly0_Polys[40] __attribute__((section (".noreloc"))) = {
   3, 0, 5, 2, 4,
   3, 0, 2, 3, 1,
   3, 0, 3, 4, 2,
@@ -45,7 +45,7 @@ static const uint8 kPoly0_Polys[40] = {
   3, 1, 4, 3, 2,
   3, 1, 5, 4, 3,
 };
-static const Vertex3 kPoly1_Vtx[6] = {
+static const Vertex3 kPoly1_Vtx[6] __attribute__((section (".noreloc"))) = {
   {  0,  40,  10},
   { 40, -40,  10},
   {-40, -40,  10},
@@ -53,7 +53,7 @@ static const Vertex3 kPoly1_Vtx[6] = {
   {-40, -40, -10},
   { 40, -40, -10},
 };
-static const uint8 kPoly1_Polys[28] = {
+static const uint8 kPoly1_Polys[28] __attribute__((section (".noreloc"))) = {
   3, 0, 1, 2, 7,
   3, 3, 4, 5, 6,
   4, 0, 3, 5, 1, 5,

@@ -57,7 +57,7 @@ static const uint16 kHudItemInVramPtr_Old[20] = {
 
 #define kHudItemInVramPtr (kNewStyleInventory ? kHudItemInVramPtr_New : kHudItemInVramPtr_Old)
 
-static const ItemBoxGfx kHudItemBottles[9] = {
+static const ItemBoxGfx kHudItemBottles[9] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x2044, 0x2045, 0x2046, 0x2047}},
   {{0x2837, 0x2838, 0x2cc3, 0x2cd3}},
@@ -68,125 +68,125 @@ static const ItemBoxGfx kHudItemBottles[9] = {
   {{0x2837, 0x2838, 0x2839, 0x283a}},
   {{0x2837, 0x2838, 0x2839, 0x283a}},
 };
-static const ItemBoxGfx kHudItemBow[5] = {
+static const ItemBoxGfx kHudItemBow[5] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x28ba, 0x28e9, 0x28e8, 0x28cb}},
   {{0x28ba, 0x284a, 0x2849, 0x28cb}},
   {{0x28ba, 0x28e9, 0x28e8, 0x28cb}},
   {{0x28ba, 0x28bb, 0x24ca, 0x28cb}},
 };
-static const ItemBoxGfx kHudItemBoomerang[3] = {
+static const ItemBoxGfx kHudItemBoomerang[3] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x2cb8, 0x2cb9, 0x2cf5, 0x2cc9}},
   {{0x24b8, 0x24b9, 0x24f5, 0x24c9}},
 };
-static const ItemBoxGfx kHudItemHookshot[2] = {
+static const ItemBoxGfx kHudItemHookshot[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x24f5, 0x24f6, 0x24c0, 0x24f5}},
 };
-static const ItemBoxGfx kHudItemBombs[2] = {
+static const ItemBoxGfx kHudItemBombs[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x2cb2, 0x2cb3, 0x2cc2, 0x6cc2}},
 };
-static const ItemBoxGfx kHudItemMushroom[3] = {
+static const ItemBoxGfx kHudItemMushroom[3] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x2444, 0x2445, 0x2446, 0x2447}},
   {{0x203b, 0x203c, 0x203d, 0x203e}},
 };
-static const ItemBoxGfx kHudItemFireRod[2] = {
+static const ItemBoxGfx kHudItemFireRod[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x24b0, 0x24b1, 0x24c0, 0x24c1}},
 };
-static const ItemBoxGfx kHudItemIceRod[2] = {
+static const ItemBoxGfx kHudItemIceRod[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x2cb0, 0x2cbe, 0x2cc0, 0x2cc1}},
 };
-static const ItemBoxGfx kHudItemBombos[2] = {
+static const ItemBoxGfx kHudItemBombos[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x287d, 0x287e, 0xe87e, 0xe87d}},
 };
-static const ItemBoxGfx kHudItemEther[2] = {
+static const ItemBoxGfx kHudItemEther[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5,  0x20f5,  0x20f5}},
   {{0x2876, 0x2877, 0xE877, 0xE876}},
 };
-static const ItemBoxGfx kHudItemQuake[2] = {
+static const ItemBoxGfx kHudItemQuake[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5,  0x20f5,  0x20f5}},
   {{0x2866, 0x2867, 0xE867, 0xE866}},
 };
-static const ItemBoxGfx kHudItemTorch[2] = {
+static const ItemBoxGfx kHudItemTorch[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x24bc, 0x24bd, 0x24cc, 0x24cd}},
 };
-static const ItemBoxGfx kHudItemHammer[2] = {
+static const ItemBoxGfx kHudItemHammer[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x20b6, 0x20b7, 0x20c6, 0x20c7}},
 };
-static const ItemBoxGfx kHudItemFlute[4] = {
+static const ItemBoxGfx kHudItemFlute[4] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x20d0, 0x20d1, 0x20e0, 0x20e1}},
   {{0x2cd4, 0x2cd5, 0x2ce4, 0x2ce5}},
   {{0x2cd4, 0x2cd5, 0x2ce4, 0x2ce5}},
 };
-static const ItemBoxGfx kHudItemBugNet[2] = {
+static const ItemBoxGfx kHudItemBugNet[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x3c40, 0x3c41, 0x2842, 0x3c43}},
 };
-static const ItemBoxGfx kHudItemBookMudora[2] = {
+static const ItemBoxGfx kHudItemBookMudora[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x3ca5, 0x3ca6, 0x3cd8, 0x3cd9}},
 };
-static const ItemBoxGfx kHudItemCaneSomaria[2] = {
+static const ItemBoxGfx kHudItemCaneSomaria[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x24dc, 0x24dd, 0x24ec, 0x24ed}},
 };
-static const ItemBoxGfx kHudItemCaneByrna[2] = {
+static const ItemBoxGfx kHudItemCaneByrna[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x2cdc, 0x2cdd, 0x2cec, 0x2ced}},
 };
-static const ItemBoxGfx kHudItemCape[2] = {
+static const ItemBoxGfx kHudItemCape[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x24b4, 0x24b5, 0x24c4, 0x24c5}},
 };
-static const ItemBoxGfx kHudItemMirror[4] = {
+static const ItemBoxGfx kHudItemMirror[4] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x28de, 0x28df, 0x28ee, 0x28ef}},
   {{0x2c62, 0x2c63, 0x2c72, 0x2c73}},
   {{0x2886, 0x2887, 0x2888, 0x2889}},
 };
-static const ItemBoxGfx kHudItemGloves[3] = {
+static const ItemBoxGfx kHudItemGloves[3] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x2130, 0x2131, 0x2140, 0x2141}},
   {{0x28da, 0x28db, 0x28ea, 0x28eb}},
 };
-static const ItemBoxGfx kHudItemBoots[2] = {
+static const ItemBoxGfx kHudItemBoots[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x3429, 0x342a, 0x342b, 0x342c}},
 };
-static const ItemBoxGfx kHudItemFlippers[2] = {
+static const ItemBoxGfx kHudItemFlippers[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x2c9a, 0x2c9b, 0x2c9d, 0x2c9e}},
 };
-static const ItemBoxGfx kHudItemMoonPearl[2] = {
+static const ItemBoxGfx kHudItemMoonPearl[2] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x2433, 0x2434, 0x2435, 0x2436}},
 };
-static const ItemBoxGfx kHudItemEmpty[1] = {
+static const ItemBoxGfx kHudItemEmpty[1] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
 };
-static const ItemBoxGfx kHudItemSword[5] = {
+static const ItemBoxGfx kHudItemSword[5] __attribute__((section (".noreloc"))) = {
   {{0x20f5, 0x20f5, 0x20f5, 0x20f5}},
   {{0x2c64, 0x2cce, 0x2c75, 0x3d25}},
   {{0x2c8a, 0x2c65, 0x2474, 0x3d26}},
   {{0x248a, 0x2465, 0x3c74, 0x2d48}},
   {{0x288a, 0x2865, 0x2c74, 0x2d39}},
 };
-static const ItemBoxGfx kHudItemShield[4] = {
+static const ItemBoxGfx kHudItemShield[4] __attribute__((section (".noreloc"))) = {
   {{0x24f5, 0x24f5, 0x24f5, 0x24f5}},
   {{0x2cfd, 0x6cfd, 0x2cfe, 0x6cfe}},
   {{0x34ff, 0x74ff, 0x349f, 0x749f}},
   {{0x2880, 0x2881, 0x288d, 0x288e}},
 };
-static const ItemBoxGfx kHudItemArmor[5] = {
+static const ItemBoxGfx kHudItemArmor[5] __attribute__((section (".noreloc"))) = {
   {{0x3c68, 0x7c68, 0x3c78, 0x7c78}},
   {{0x2c68, 0x6c68, 0x2c78, 0x6c78}},
   {{0x2468, 0x6468, 0x2478, 0x6478}},
