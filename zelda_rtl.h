@@ -54,6 +54,8 @@ void ZeldaApuLock();
 void ZeldaApuUnlock();
 bool ZeldaIsPlayingMusicTrack(uint8 track);
 uint8 ZeldaGetEntranceMusicTrack(int track);
+int ZeldaGetLanguageCount();
+void ZeldaGetLanguageAtIndex(int i, char *dest);
 void ZeldaSetLanguage(const char *language);
 void PatchCommand(char cmd);
 

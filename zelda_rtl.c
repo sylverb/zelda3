@@ -787,6 +787,32 @@ bool ZeldaRunFrame(int inputs) {
   return false;//is_replay;
 }
 
+int ZeldaGetLanguageCount() {
+  int n = 0;
+  for (int i = 0; ; i++) {
+    MemBlk mb = kDialogueMap(i);
+    if (mb.ptr == 0)
+      break;
+    n++;
+  }
+  return n;
+}
+
+void ZeldaGetLanguageAtIndex(int i, char *dest) {
+  MemBlk mb = kDialogueMap(i);
+  if (mb.ptr == 0)
+  {
+    dest = 0;
+    return;
+  }
+  MemBlk name = FindIndexInMemblk(mb, 0);
+  if (name.ptr != 0)
+  {
+    memcpy(dest, name.ptr, name.size);
+    dest[name.size] = 0;
+  }
+}
+
 void ZeldaSetLanguage(const char *language) {
   static const uint8 kDefaultConf[3] = { 0, 0, 0 };
   MemBlk found = { kDefaultConf, 3 };

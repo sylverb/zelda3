@@ -2529,7 +2529,9 @@ void VWF_RenderSingle(int c) {  // 8ecab8
   
   const uint8 *kFontData = FindIndexInMemblk(g_zenv.dialogue_font_blk, 0).ptr;
   uint8 width = FindIndexInMemblk(g_zenv.dialogue_font_blk, 1).ptr[c];
-  assert(width <= 8);
+//  assert(width <= 8);
+  if (width > 8) // It could happen if changing language while showing a message
+    width = 8;   // This is a workaround to avoid crashing
 
   int i = vwf_var1++;
   uint8 arrval = vwf_arr[i];
