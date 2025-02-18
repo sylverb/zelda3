@@ -62,6 +62,9 @@ static FORCEINLINE uint UintMax(uint a, uint b) { return a > b ? a : b; }
 #define WORD(x) (*(uint16*)&(x))
 #define DWORD(x) (*(uint32*)&(x))
 #define XY(x, y) ((y)*64+(x))
+// system RAM is in AHB memory which is not allowing unaligned access,
+// use this macro to access 16-bit values in RAM that could not be aligned
+#define RAM_WORD(x) ({ uint16_t _w; memcpy(&_w, &(x), sizeof(uint16_t)); _w; })
 
 #ifndef swap16
 static inline uint16 swap16(uint16 v) { return (v << 8) | (v >> 8); }
