@@ -611,7 +611,7 @@ handle_cmd_00:
     }
 next_phrase:
     for (;;) {
-      t = WORD(p->ram[p->music_ptr_toplevel]);
+      t = RAM_WORD(p->ram[p->music_ptr_toplevel]);
       p->music_ptr_toplevel += 2;
       if ((t >> 8) != 0)
         break;
@@ -624,14 +624,14 @@ next_phrase:
       } else {
         if (sign8(--p->block_count))
           p->block_count = t;
-        t = WORD(p->ram[p->music_ptr_toplevel]);
+        t = RAM_WORD(p->ram[p->music_ptr_toplevel]);
         p->music_ptr_toplevel += 2;
         if (p->block_count != 0)
           p->music_ptr_toplevel = t;
       }
     }
     for (int i = 0; i < 8; i++)
-      p->channel[i].pattern_order_ptr_for_chan = WORD(p->ram[t]), t += 2;
+      p->channel[i].pattern_order_ptr_for_chan = RAM_WORD(p->ram[t]), t += 2;
 
     c = p->channel, p->cur_chan_bit = 1;
     do {
