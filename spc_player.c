@@ -150,7 +150,7 @@ static const MemMapSized kSpcPlayer_Maps[] = {
 
 static void PlayNote(SpcPlayer *p, Channel *c, uint8 note);
 
-static void Dsp_Write(SpcPlayer *p, uint8_t reg, uint8 value) {
+static FORCEINLINE void Dsp_Write(SpcPlayer *p, uint8_t reg, uint8 value) {
   DspRegWriteHistory *hist = p->reg_write_history;
   if (hist) {
     if (hist->count < 256) {
@@ -168,7 +168,7 @@ static void Not_Implemented() {
   printf("Not Implemented\n");
 }
 
-static uint16 SpcDivHelper(int a, uint8 b) {
+static FORCEINLINE uint16 SpcDivHelper(int a, uint8 b) {
   int org_a = a;
   if (a & 0x100)
     a = -a;
@@ -178,7 +178,7 @@ static uint16 SpcDivHelper(int a, uint8 b) {
   return (org_a & 0x100) ? -t : t;
 }
 
-static inline void Chan_DoAnyFade(uint16 *p, uint16 add, uint8 target, uint8 cont) {
+static FORCEINLINE void Chan_DoAnyFade(uint16 *p, uint16 add, uint8 target, uint8 cont) {
   if (!cont)
     *p = target << 8;
   else
@@ -227,7 +227,7 @@ static void WriteVolumeToDsp(SpcPlayer *p, Channel *c, uint16 volume) {
   }
 }
 
-static void WritePitch(SpcPlayer *p, Channel *c, uint16 pitch) {
+static FORCEINLINE void WritePitch(SpcPlayer *p, Channel *c, uint16 pitch) {
   static const uint16 kBaseNoteFreqs[13] = {2143, 2270, 2405, 2548, 2700, 2860, 3030, 3211, 3402, 3604, 3818, 4045, 4286};
   if ((pitch >> 8) >= 0x34) {
     pitch += (pitch >> 8) - 0x34;
@@ -296,7 +296,7 @@ static void Channel_SetInstrument(SpcPlayer *p, Channel *c, uint8 instrument) {
   c->instrument_pitch_base = ip[4] << 8 | ip[5];
 }
 
-static void ComputePitchAdd(Channel *c, uint8 pitch) {
+static FORCEINLINE void ComputePitchAdd(Channel *c, uint8 pitch) {
   c->pitch_target = pitch & 0x7f;
   c->pitch_add_per_tick = SpcDivHelper(c->pitch_target - (c->pitch >> 8), c->pitch_slide_length);
 }
@@ -470,7 +470,7 @@ static void HandleTremolo(SpcPlayer *p, Channel *c) {
   Not_Implemented();
 }
 
-static void CalcVibratoAddPitch(SpcPlayer *p, Channel *c, uint16 pitch, uint8 value) {
+static FORCEINLINE void CalcVibratoAddPitch(SpcPlayer *p, Channel *c, uint16 pitch, uint8 value) {
   int t = value << 2;
   t ^= (t & 0x100) ? 0xff : 0;
   int r = (c->vib_depth >= 0xf1) ?
@@ -479,7 +479,7 @@ static void CalcVibratoAddPitch(SpcPlayer *p, Channel *c, uint16 pitch, uint8 va
   WritePitch(p, c, pitch + (value & 0x80 ? -r : r));
 }
 
-static void HandlePanAndSweep(SpcPlayer *p, Channel *c) {
+static FORCEINLINE void HandlePanAndSweep(SpcPlayer *p, Channel *c) {
   p->did_affect_volumepitch_flag = 0;
   if (c->tremolo_depth) {
     c->tremolo_hold_count = c->tremolo_delay_ticks;
@@ -548,7 +548,7 @@ static void HandleNoteTick(SpcPlayer *p, Channel *c) {
     WritePitch(p, c, pitch);
 }
 
-void CalcFinalVolume(SpcPlayer *p, Channel *c, uint8 vol) {
+FORCEINLINE void CalcFinalVolume(SpcPlayer *p, Channel *c, uint8 vol) {
   int t = (p->master_volume >> 8) * vol >> 8;
   t = t * c->channel_volume_master >> 8;
   t = t * (c->channel_volume >> 8) >> 8;
@@ -761,12 +761,12 @@ static void Sfx_TurnOffChannel(SpcPlayer *p, Channel *c) {
   }
 }
 
-static void Write_KeyOn(SpcPlayer *p, uint8 bit) {
+static FORCEINLINE void Write_KeyOn(SpcPlayer *p, uint8 bit) {
   Dsp_Write(p, KOF, 0);
   Dsp_Write(p, KON, bit);
 }
 
-static void PlayNote(SpcPlayer *p, Channel *c, uint8 note) {
+static FORCEINLINE void PlayNote(SpcPlayer *p, Channel *c, uint8 note) {
   if (note >= 0xca) {
     Channel_SetInstrument(p, c, note);
     note = 0xa4;
@@ -805,7 +805,7 @@ static void PlayNote(SpcPlayer *p, Channel *c, uint8 note) {
   WritePitch(p, c, c->pitch);
 }
 
-static void Sfx_MaybeDisableEcho(SpcPlayer *p) {
+static FORCEINLINE void Sfx_MaybeDisableEcho(SpcPlayer *p) {
   if (!(p->port_to_snes[0] & 0x10) || p->current_bit & p->sfx_channels_echo_mask2) {
     if (p->current_bit & p->reg_EON) {
       p->reg_EON ^= p->current_bit;
