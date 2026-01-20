@@ -23,6 +23,15 @@ static bool ppu_getWindowState(Ppu* ppu, int layer, int x);
 static bool ppu_evaluateSprites(Ppu* ppu, int line);
 static void PpuDrawWholeLine(Ppu *ppu, uint y);
 
+
+typedef struct PpuWindows {
+  int16 edges[6];
+  uint8 nr;
+  uint8 bits;
+} PpuWindows;
+static void PpuWindows_Clear(PpuWindows *win, Ppu *ppu, uint layer);
+static void PpuWindows_Calc(PpuWindows *win, Ppu *ppu, uint layer);
+
 #define IS_SCREEN_ENABLED(ppu, sub, layer) (ppu->screenEnabled[sub] & (1 << layer))
 #define IS_SCREEN_WINDOWED(ppu, sub, layer) (ppu->screenWindowed[sub] & (1 << layer))
 #define IS_MOSAIC_ENABLED(ppu, layer) ((ppu->mosaicEnabled & (1 << layer)))
@@ -35,12 +44,20 @@ enum {
 };
 
 static Ppu g_ppu;
+static PpuWindows g_line_windows_sub0[5];
+static PpuWindows g_line_windows_sub1[5];
+static PpuZbufType g_emptyBackgrop[kPpuXPixels];
 
 Ppu* ppu_init() {
   // Static allocation
   Ppu* ppu = &g_ppu; //(Ppu * )calloc(1,sizeof(Ppu));
   ppu->vram = (uint16_t *)itc_calloc(1, 0x10000); // 64KB of VRAM in ITC RAM
   ppu->extraLeftRight = kPpuExtraLeftRight;
+
+  // Create cleared backdrop
+  for (size_t i = 0; i != countof(g_emptyBackgrop); i += 4)
+    *(uint64*)&g_emptyBackgrop[i] = 0x0500050005000500;
+
   return ppu;
 }
 
@@ -158,8 +175,7 @@ void PpuBeginDrawing(Ppu *ppu, uint8_t *pixels, size_t pitch, uint32_t render_fl
 }
 
 static inline void ClearBackdrop(PpuPixelPrioBufs *buf) {
-  for (size_t i = 0; i != countof(buf->data); i += 4)
-    *(uint64*)&buf->data[i] = 0x0500050005000500;
+  memcpy(buf->data, g_emptyBackgrop, sizeof(buf->data));
 }
 
 
@@ -183,6 +199,12 @@ void ppu_runLine(Ppu *ppu, int line) {
       return;
     }
 
+    // Precalculate windows for the lines
+    for (size_t layer = 0; layer < 5; layer++) {
+      IS_SCREEN_WINDOWED(ppu, false, layer) ? PpuWindows_Calc(&g_line_windows_sub0[layer], ppu, layer) : PpuWindows_Clear(&g_line_windows_sub0[layer], ppu, layer);
+      IS_SCREEN_WINDOWED(ppu, true, layer) ? PpuWindows_Calc(&g_line_windows_sub1[layer], ppu, layer) : PpuWindows_Clear(&g_line_windows_sub1[layer], ppu, layer);
+    }
+
     if (ppu->renderFlags & kPpuRenderFlags_NewRenderer) {
       PpuDrawWholeLine(ppu, line);
     } else {
@@ -199,12 +221,6 @@ void ppu_runLine(Ppu *ppu, int line) {
     }
   }
 }
-
-typedef struct PpuWindows {
-  int16 edges[6];
-  uint8 nr;
-  uint8 bits;
-} PpuWindows;
 
 static void PpuWindows_Clear(PpuWindows *win, Ppu *ppu, uint layer) {
   win->edges[0] = -(layer != 2 ? ppu->extraLeftCur : 0);
@@ -286,8 +302,7 @@ static void PpuDrawBackground_4bpp(Ppu *ppu, uint y, bool sub, uint layer, PpuZb
   enum { kPaletteShift = 6 };
   if (!IS_SCREEN_ENABLED(ppu, sub, layer))
     return;  // layer is completely hidden
-  PpuWindows win;
-  IS_SCREEN_WINDOWED(ppu, sub, layer) ? PpuWindows_Calc(&win, ppu, layer) : PpuWindows_Clear(&win, ppu, layer);
+  PpuWindows win = sub ? g_line_windows_sub1[layer] : g_line_windows_sub0[layer];
   BgLayer *bglayer = &ppu->bgLayer[layer];
   y += bglayer->vScroll;
   int sc_offs = bglayer->tilemapAdr + (((y >> 3) & 0x1f) << 5);
@@ -384,8 +399,7 @@ static void PpuDrawBackground_2bpp(Ppu *ppu, uint y, bool sub, uint layer, PpuZb
   enum { kPaletteShift = 8 };
   if (!IS_SCREEN_ENABLED(ppu, sub, layer))
     return;  // layer is completely hidden
-  PpuWindows win;
-  IS_SCREEN_WINDOWED(ppu, sub, layer) ? PpuWindows_Calc(&win, ppu, layer) : PpuWindows_Clear(&win, ppu, layer);
+  PpuWindows win = sub ? g_line_windows_sub1[layer] : g_line_windows_sub0[layer];
   BgLayer *bglayer = &ppu->bgLayer[layer];
   y += bglayer->vScroll;
   int sc_offs = bglayer->tilemapAdr + (((y >> 3) & 0x1f) << 5);
@@ -481,8 +495,7 @@ static void PpuDrawBackground_4bpp_mosaic(Ppu *ppu, uint y, bool sub, uint layer
   enum { kPaletteShift = 6 };
   if (!IS_SCREEN_ENABLED(ppu, sub, layer))
     return;  // layer is completely hidden
-  PpuWindows win;
-  IS_SCREEN_WINDOWED(ppu, sub, layer) ? PpuWindows_Calc(&win, ppu, layer) : PpuWindows_Clear(&win, ppu, layer);
+  PpuWindows win = sub ? g_line_windows_sub1[layer] : g_line_windows_sub0[layer];
   BgLayer *bglayer = &ppu->bgLayer[layer];
   y = ppu->mosaicModulo[y] + bglayer->vScroll;
   int sc_offs = bglayer->tilemapAdr + (((y >> 3) & 0x1f) << 5);
@@ -540,8 +553,7 @@ static void PpuDrawBackground_2bpp_mosaic(Ppu *ppu, int y, bool sub, uint layer,
   enum { kPaletteShift = 8 };
   if (!IS_SCREEN_ENABLED(ppu, sub, layer))
     return;  // layer is completely hidden
-  PpuWindows win;
-  IS_SCREEN_WINDOWED(ppu, sub, layer) ? PpuWindows_Calc(&win, ppu, layer) : PpuWindows_Clear(&win, ppu, layer);
+  PpuWindows win = sub ? g_line_windows_sub1[layer] : g_line_windows_sub0[layer];
   BgLayer *bglayer = &ppu->bgLayer[layer];
   y = ppu->mosaicModulo[y] + bglayer->vScroll;
   int sc_offs = bglayer->tilemapAdr + (((y >> 3) & 0x1f) << 5);
@@ -600,8 +612,7 @@ static void PpuDrawSprites(Ppu *ppu, uint y, uint sub, bool clear_backdrop) {
   int layer = 4;
   if (!IS_SCREEN_ENABLED(ppu, sub, layer))
     return;  // layer is completely hidden
-  PpuWindows win;
-  IS_SCREEN_WINDOWED(ppu, sub, layer) ? PpuWindows_Calc(&win, ppu, layer) : PpuWindows_Clear(&win, ppu, layer);
+  PpuWindows win = sub ? g_line_windows_sub1[layer] : g_line_windows_sub0[layer];
   for (size_t windex = 0; windex < win.nr; windex++) {
     if (win.bits & (1 << windex))
       continue;  // layer is disabled for this window part
@@ -625,8 +636,7 @@ static void PpuDrawBackground_mode7(Ppu *ppu, uint y, bool sub, PpuZbufType z) {
   int layer = 0;
   if (!IS_SCREEN_ENABLED(ppu, sub, layer))
     return;  // layer is completely hidden
-  PpuWindows win;
-  IS_SCREEN_WINDOWED(ppu, sub, layer) ? PpuWindows_Calc(&win, ppu, layer) : PpuWindows_Clear(&win, ppu, layer);
+  PpuWindows win = sub ? g_line_windows_sub1[layer] : g_line_windows_sub0[layer];
 
   // expand 13-bit values to signed values
   int hScroll = ((int16_t)(ppu->m7matrix[6] << 3)) >> 3;
