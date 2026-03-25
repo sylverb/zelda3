@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <limits.h>
+#include "util.h"
 #include "dsp_regs.h"
 #include "dsp.h"
 
@@ -18,6 +19,13 @@ static const int rateValues[32] = {
   10, 8, 6, 5, 4, 3, 2, 1
 };
 
+#define SAMPLE_INTERP_MODE_LINEAR 1
+#define SAMPLE_INTERP_MODE_CUBIC 2
+#define SAMPLE_INTERP_MODE_GAUSS 3
+
+#define SAMPLE_INTERP_MODE SAMPLE_INTERP_MODE_CUBIC
+
+#if SAMPLE_INTERP_MODE == SAMPLE_INTERP_MODE_GAUSS
 static const int gaussValues[512] = {
   0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000,
   0x001, 0x001, 0x001, 0x001, 0x001, 0x001, 0x001, 0x001, 0x001, 0x001, 0x001, 0x002, 0x002, 0x002, 0x002, 0x002,
@@ -52,15 +60,54 @@ static const int gaussValues[512] = {
   0x502, 0x503, 0x504, 0x506, 0x507, 0x508, 0x50A, 0x50B, 0x50C, 0x50D, 0x50E, 0x50F, 0x510, 0x511, 0x511, 0x512,
   0x513, 0x514, 0x514, 0x515, 0x516, 0x516, 0x517, 0x517, 0x517, 0x518, 0x518, 0x518, 0x518, 0x518, 0x519, 0x519
 };
+#elif SAMPLE_INTERP_MODE == SAMPLE_INTERP_MODE_CUBIC
+// Interpolation by Mudlord
+static const int16_t cubicValues [514] = {
+   0,  -4,  -8, -12, -16, -20, -23, -27, -30, -34, -37, -41, -44, -47, -50, -53,
+ -56, -59, -62, -65, -68, -71, -73, -76, -78, -81, -84, -87, -89, -91, -93, -95,
+ -98,-100,-102,-104,-106,-109,-110,-112,-113,-116,-117,-119,-121,-122,-123,-125,
+-126,-128,-129,-131,-132,-134,-134,-136,-136,-138,-138,-140,-141,-141,-142,-143,
+-144,-144,-145,-146,-147,-148,-147,-148,-148,-149,-149,-150,-150,-150,-150,-151,
+-151,-151,-151,-151,-152,-152,-151,-152,-151,-152,-151,-151,-151,-151,-150,-150,
+-150,-149,-149,-149,-149,-148,-147,-147,-146,-146,-145,-145,-144,-144,-143,-142,
+-141,-141,-140,-139,-139,-138,-137,-136,-135,-135,-133,-133,-132,-131,-130,-129,
+-128,-127,-126,-125,-124,-123,-121,-121,-119,-118,-117,-116,-115,-114,-112,-111,
+-110,-109,-107,-106,-105,-104,-102,-102,-100, -99, -97, -97, -95, -94, -92, -91,
+ -90, -88, -87, -86, -85, -84, -82, -81, -79, -78, -76, -76, -74, -73, -71, -70,
+ -68, -67, -66, -65, -63, -62, -60, -60, -58, -57, -55, -55, -53, -52, -50, -49,
+ -48, -46, -45, -44, -43, -42, -40, -39, -38, -37, -36, -35, -34, -32, -31, -30,
+ -29, -28, -27, -26, -25, -24, -23, -22, -21, -20, -19, -19, -17, -16, -15, -14,
+ -14, -13, -12, -11, -11, -10,  -9,  -9,  -8,  -8,  -7,  -7,  -6,  -5,  -4,  -4,
+  -3,  -3,  -3,  -2,  -2,  -2,  -1,  -1,   0,  -1,   0,  -1,   0,   0,   0,   0,
+   0,
+2048,2048,2048,2048,2047,2047,2046,2045,2043,2042,2041,2039,2037,2035,2033,2031,
+2028,2026,2024,2021,2018,2015,2012,2009,2005,2002,1999,1995,1991,1987,1982,1978,
+1974,1969,1965,1960,1955,1951,1946,1940,1934,1929,1924,1918,1912,1906,1900,1895,
+1888,1882,1875,1869,1862,1856,1849,1842,1835,1828,1821,1814,1806,1799,1791,1783,
+1776,1768,1760,1753,1744,1737,1728,1720,1711,1703,1695,1686,1677,1668,1659,1651,
+1641,1633,1623,1614,1605,1596,1587,1577,1567,1559,1549,1539,1529,1520,1510,1499,
+1490,1480,1470,1460,1450,1440,1430,1420,1408,1398,1389,1378,1367,1357,1346,1336,
+1325,1315,1304,1293,1282,1272,1261,1250,1239,1229,1218,1207,1196,1185,1174,1163,
+1152,1141,1130,1119,1108,1097,1086,1075,1063,1052,1042,1030,1019,1008, 997, 986,
+ 974, 964, 952, 941, 930, 919, 908, 897, 886, 875, 864, 853, 842, 831, 820, 809,
+ 798, 787, 776, 765, 754, 744, 733, 722, 711, 700, 690, 679, 668, 658, 647, 637,
+ 626, 616, 605, 595, 584, 574, 564, 554, 543, 534, 524, 514, 503, 494, 483, 473,
+ 464, 454, 444, 435, 425, 416, 407, 397, 387, 378, 370, 360, 351, 342, 333, 325,
+ 315, 307, 298, 290, 281, 273, 265, 256, 248, 241, 233, 225, 216, 209, 201, 193,
+ 186, 178, 171, 164, 157, 150, 143, 137, 129, 123, 117, 110, 103,  97,  91,  85,
+  79,  74,  68,  62,  56,  51,  46,  41,  35,  31,  27,  22,  17,  13,   8,   4,
+   0
+};
+#endif
 
 static Dsp g_dsp;
 
-static void dsp_cycleChannel(Dsp* dsp, int ch);
-static void dsp_handleEcho(Dsp* dsp, int* outputL, int* outputR);
-static void dsp_handleGain(Dsp* dsp, int ch);
-static void dsp_decodeBrr(Dsp* dsp, int ch);
-static int16_t dsp_getSample(Dsp* dsp, int ch, int sampleNum, int offset);
-static void dsp_handleNoise(Dsp* dsp);
+static FORCEINLINE void dsp_cycleChannel(Dsp* dsp, int ch);
+static FORCEINLINE void dsp_handleEcho(Dsp* dsp, int* outputL, int* outputR);
+static FORCEINLINE void dsp_handleGain(Dsp* dsp, int ch);
+static FORCEINLINE void dsp_decodeBrr(Dsp* dsp, int ch);
+static FORCEINLINE int16_t dsp_getSample(Dsp* dsp, int ch, int sampleNum, int offset);
+static FORCEINLINE void dsp_handleNoise(Dsp* dsp);
 
 Dsp* dsp_init(uint8_t *apu_ram) {
   Dsp* dsp = &g_dsp;//(Dsp*)malloc(sizeof(Dsp));
@@ -138,13 +185,13 @@ void dsp_cycle(Dsp* dsp) {
     dsp_cycleChannel(dsp, i);
     totalL += (dsp->channel[i].sampleOut * dsp->channel[i].volumeL) >> 6;
     totalR += (dsp->channel[i].sampleOut * dsp->channel[i].volumeR) >> 6;
-    totalL = totalL < -0x8000 ? -0x8000 : (totalL > 0x7fff ? 0x7fff : totalL); // clamp 16-bit
-    totalR = totalR < -0x8000 ? -0x8000 : (totalR > 0x7fff ? 0x7fff : totalR); // clamp 16-bit
+    CLAMP16(totalL);
+    CLAMP16(totalR);
   }
   totalL = (totalL * dsp->masterVolumeL) >> 7;
   totalR = (totalR * dsp->masterVolumeR) >> 7;
-  totalL = totalL < -0x8000 ? -0x8000 : (totalL > 0x7fff ? 0x7fff : totalL); // clamp 16-bit
-  totalR = totalR < -0x8000 ? -0x8000 : (totalR > 0x7fff ? 0x7fff : totalR); // clamp 16-bit
+  CLAMP16(totalL);
+  CLAMP16(totalR);
   dsp_handleEcho(dsp, &totalL, &totalR);
   if(dsp->mute) {
     totalL = 0;
@@ -182,8 +229,8 @@ static void dsp_handleEcho(Dsp* dsp, int* outputL, int* outputR) {
       sumR = ((int16_t) (sumR & 0xffff)); // clip 16-bit
     }
   }
-  sumL = sumL < -0x8000 ? -0x8000 : (sumL > 0x7fff ? 0x7fff : sumL); // clamp 16-bit
-  sumR = sumR < -0x8000 ? -0x8000 : (sumR > 0x7fff ? 0x7fff : sumR); // clamp 16-bit
+  CLAMP16(sumL);
+  CLAMP16(sumR);
   // modify output with sum
   int outL = *outputL + ((sumL * dsp->echoVolumeL) >> 7);
   int outR = *outputR + ((sumR * dsp->echoVolumeR) >> 7);
@@ -195,15 +242,15 @@ static void dsp_handleEcho(Dsp* dsp, int* outputL, int* outputR) {
     if(dsp->channel[i].echoEnable) {
       inL += (dsp->channel[i].sampleOut * dsp->channel[i].volumeL) >> 6;
       inR += (dsp->channel[i].sampleOut * dsp->channel[i].volumeR) >> 6;
-      inL = inL < -0x8000 ? -0x8000 : (inL > 0x7fff ? 0x7fff : inL); // clamp 16-bit
-      inR = inR < -0x8000 ? -0x8000 : (inR > 0x7fff ? 0x7fff : inR); // clamp 16-bit
+      CLAMP16(inL);
+      CLAMP16(inR);
     }
   }
   // write this to ram
   inL += (sumL * dsp->feedbackVolume) >> 7;
   inR += (sumR * dsp->feedbackVolume) >> 7;
-  inL = inL < -0x8000 ? -0x8000 : (inL > 0x7fff ? 0x7fff : inL); // clamp 16-bit
-  inR = inR < -0x8000 ? -0x8000 : (inR > 0x7fff ? 0x7fff : inR); // clamp 16-bit
+  CLAMP16(inL);
+  CLAMP16(inR);
   inL &= 0xfffe;
   inR &= 0xfffe;
   if(dsp->echoWrites) {
@@ -338,17 +385,46 @@ static void dsp_handleGain(Dsp* dsp, int ch) {
 }
 
 static int16_t dsp_getSample(Dsp* dsp, int ch, int sampleNum, int offset) {
-  int16_t news = dsp->channel[ch].decodeBuffer[sampleNum + 3];
-  int16_t olds = dsp->channel[ch].decodeBuffer[sampleNum + 2];
-  int16_t olders = dsp->channel[ch].decodeBuffer[sampleNum + 1];
-  int16_t oldests = dsp->channel[ch].decodeBuffer[sampleNum];
+  int16_t* in = &dsp->channel[ch].decodeBuffer[sampleNum];
+
+#if SAMPLE_INTERP_MODE == SAMPLE_INTERP_MODE_GAUSS
+  // Gaussian filter
+  int16_t news = in[3];
+  int16_t olds = in[2];
+  int16_t olders = in[1];
+  int16_t oldests = in[0];
   int out = (gaussValues[0xff - offset] * oldests) >> 10;
   out += (gaussValues[0x1ff - offset] * olders) >> 10;
   out += (gaussValues[0x100 + offset] * olds) >> 10;
   out = ((int16_t) (out & 0xffff)); // clip 16-bit
   out += (gaussValues[offset] * news) >> 10;
-  out = out < -0x8000 ? -0x8000 : (out > 0x7fff ? 0x7fff : out); // clamp 16-bit
+  CLAMP16(out);
   return out >> 1;
+#elif SAMPLE_INTERP_MODE == SAMPLE_INTERP_MODE_CUBIC
+  // https://github.com/snes9xgit/snes9x/blob/83ebd9d9d94521dde231beac0ad5ca253bd767f1/apu/bapu/dsp/SPC_DSP.cpp#L444
+  // Cubic filter
+  const int16_t* fwd = cubicValues       + offset;
+  const int16_t* rev = cubicValues + 256 - offset; // mirror left half of cubic
+
+  int out;
+  out  = fwd [  0] * in [0];
+  out += fwd [257] * in [1];
+  out += rev [257] * in [2];
+  out += rev [  0] * in [3];
+  out >>= 11;
+
+  CLAMP16( out );
+  return out;
+#else
+  // Linear interpolation
+  int fract = dsp->channel[ch].pitchCounter & 0xFFF;
+  int out = (0x1000 - fract) * in[0];
+  out += fract  * in[1];
+  out >>= 12;
+
+  CLAMP16( out );
+  return out;
+#endif
 }
 
 static void dsp_decodeBrr(Dsp* dsp, int ch) {
@@ -395,7 +471,7 @@ static void dsp_decodeBrr(Dsp* dsp, int ch) {
       case 2: s += 2 * old + ((3 * -old) >> 5) - older + (older >> 4); break;
       case 3: s += 2 * old + ((13 * -old) >> 6) - older + ((3 * older) >> 4); break;
     }
-    s = s < -0x8000 ? -0x8000 : (s > 0x7fff ? 0x7fff : s); // clamp 16-bit
+    CLAMP16(s);
     s = ((int16_t) ((s & 0x7fff) << 1)) >> 1; // clip 15-bit
     older = old;
     old = s;
@@ -421,7 +497,7 @@ uint8_t dsp_read(Dsp* dsp, uint8_t adr) {
   return dsp->ram[adr];
 }
 
-void dsp_write(Dsp *dsp, uint8_t adr, uint8_t val) {
+FORCEINLINE void dsp_write(Dsp *dsp, uint8_t adr, uint8_t val) {
   int ch = adr >> 4;
   switch (adr) {
   case V0VOLL:
@@ -637,6 +713,32 @@ void dsp_write(Dsp *dsp, uint8_t adr, uint8_t val) {
 }
 
 void dsp_getSamples(Dsp* dsp, int16_t* sampleData, int samplesPerFrame, int numChannels) {
+  dsp->sampleOffset = 0;
+
+  // Special case for 1:1 conversion
+  if (samplesPerFrame == 534) {
+    if (numChannels == 1) {
+      for (int i = 0; i < 534; i++) {
+        int16_t* samplePtr = &dsp->sampleBuffer[i * 2];
+        int sampleL = *samplePtr ;
+        int sampleR = *(samplePtr + 1);
+        sampleData[i] = (sampleL + sampleR) >> 1;
+      }
+    } else {
+      int location = 0;
+      for (int i = 0; i < 534; i++) {
+        int16_t* samplePtr = &dsp->sampleBuffer[location * 2];
+        int sampleL = *samplePtr ;
+        int sampleR = *(samplePtr + 1);
+        sampleData[i * 2] = sampleL;
+        sampleData[i * 2 + 1] = sampleR;
+        location++;
+      }
+    }
+
+    return;
+  }
+
   // resample from 534 samples per frame to wanted value
   float adder = 534.0f / samplesPerFrame;
   float location = 0.0f;
@@ -657,5 +759,4 @@ void dsp_getSamples(Dsp* dsp, int16_t* sampleData, int samplesPerFrame, int numC
       location += adder;
     }
   }
-  dsp->sampleOffset = 0;
 }
